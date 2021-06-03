@@ -14,17 +14,18 @@ var optionEntityClass = [];
 var entityClassList = [];
 var dsDate = "0001-01-01";
 var pDate = "0001-01-01";
+var aDate = "0001-01-01";
 var inputECAnames = "";
 var algoNames = document.getElementById("algoNames");
-var RelationDSArray = []
 var lastSelected;
 var cypherHistoryList = [];
 var graphList = [];
 var similarityGraph = []
 var betweennessGraph = []
-var tagsinput =[]
-var trans="";
+var tagsinput = []
+var trans = "";
 var datasetChosed = []
+var timer;
 
 var options = {
   autoResize: true,
@@ -171,7 +172,6 @@ $(function () {
   usedOpeInit()
   var promisegraph = new Promise((resolve, reject) => {
     api.graphList().then(p => {
-      // console.log(p)
       graphList = p
       if (resolve !== undefined) {
         resolve();
@@ -182,21 +182,17 @@ $(function () {
     console.log(graphList)
     if (graphList.indexOf('graph-DDDT') == -1) {
       api.createGraph()
-      console.log('hello')
     }
     if (graphList.indexOf('graph-All') == -1) {
       api.createGraphAll()
-      console.log('hello')
     }
   })
 
   promisegraph.finally(() => {
     api.algoSimilairty().then(a => {
-      console.log(a)
       similarityGraph = a
     })
     api.algoBetweennessCentrality().then(a => {
-      console.log(a)
       betweennessGraph = a
     })
   })
@@ -298,7 +294,6 @@ $(function () {
     cypherHistoryList.unshift($('#cypherrequest').val());
     query6 = $('#cypherrequest').val()
     api.getGraph(query6).then(result => {
-      console.log(result)
       var nodes = new vis.DataSet(result[result.length - 1][0])
       var edges = new vis.DataSet(result[result.length - 1][1])
       var container = document.getElementById('viz6')
@@ -448,12 +443,6 @@ $(function () {
       network.redraw()
       network.fit()
     })
-    // if (query6.length > 3) {
-    //   viz6.renderWithCypher(query6);
-    // } else {
-    //   console.log("reload");
-    //   viz6.reload();
-    // }
     for (var i = 0; i < Math.min(10, cypherHistoryList.length); i++) {
       $('#cypherHistory').append($("<tr class='cypherRequestHistory'><td>" + cypherHistoryList[i] + "</td></tr>"))
     }
@@ -464,7 +453,6 @@ $(function () {
     $('#cypherrequest').val($(this).text())
     query6 = $(this).text()
     api.getGraph(query6).then(result => {
-      console.log(result)
       var nodes = new vis.DataSet(result[result.length - 1][0])
       var edges = new vis.DataSet(result[result.length - 1][1])
       var container = document.getElementById('viz6')
@@ -614,12 +602,6 @@ $(function () {
       network.redraw()
       network.fit()
     })
-    // if (query6.length > 3) {
-    //   viz6.renderWithCypher(query6);
-    // } else {
-    //   console.log("reload");
-    //   viz6.reload();
-    // }
   });
 
   $('#switchSearchMod').on('click', function () {
@@ -684,56 +666,41 @@ $(function () {
       $('#EntityClassProperties').empty()
       //Call of a database fucntion to get entity class by analysis
       api.getEntityClassByAnalyse($(this).attr('id').split('$')[2], $(this).attr('id').split('$')[1]).then(ec => {
-        console.log(ec)
         json = JSON.parse(JSON.stringify(ec[0]))
         $list = $('#EntityClassProperties')
 
-        /*for (propriete in ec[0]) {
-          $list.append("<p>" + propriete + " : " + json[propriete] + "</p>");
-        }*/
-
         let arr = [];
         for (propriete in ec[0]) {
-          //$list.append("<p>" + propriete + " : " + json[propriete] + "</p>");
           arr.push(propriete);
         }
         arr.sort();
-        let str = '';
         for (var i in arr) {
           if (arr[i] === "name") {
-            // console.log("name--------------------")
             $list.prepend("<p>" + arr[i] + ":" + ec[0][arr[i]] + "</p>");
           } else {
             $list.append("<p>" + arr[i] + ":" + ec[0][arr[i]] + "</p>");
           }
-          //str +=arr[i]+"="+ec[0][arr[i]]+"&"
         }
       })
       //or by dataset
       api.getEntityClassByDataset($(this).attr('id').split('$')[0], $(this).attr('id').split('$')[1], $(this).attr('id').split('$')[2]).then(ec => {
-        console.log('EntityClass : ' + ec)
         json = JSON.parse(JSON.stringify(ec[0]))
         $list = $('#EntityClassProperties')
 
-        /*for (propriete in ec[0]) {
-          $list.append("<p>" + propriete + " : " + json[propriete] + "</p>");
-        }*/
 
         let arr = [];
         for (propriete in ec[0]) {
-          //$list.append("<p>" + propriete + " : " + json[propriete] + "</p>");
           arr.push(propriete);
         }
         arr.sort();
         let str = '';
         for (var i in arr) {
           if (arr[i] === "name") {
-            // console.log("name--------------------")
             $list.prepend("<p>" + arr[i] + ":" + ec[0][arr[i]] + "</p>");
           } else {
             $list.append("<p>" + arr[i] + ":" + ec[0][arr[i]] + "</p>");
           }
-          //str +=arr[i]+"="+ec[0][arr[i]]+"&"
+
         }
       })
     }
@@ -766,20 +733,20 @@ $(function () {
 
       //Get information of the process clicked
       api
-        .getProcesses([$(this).text()])
-        .then(p => {
-          if (p) {
-            json = JSON.parse(JSON.stringify(p[0]))
-            var $p = $("#properties")
-            for (propriete in p[0]) {
-              if (propriete == 'creationDate' || propriete == "executionDate" || propriete == 'id') {
-                $p.append("<p>" + propriete + " : " + json[propriete].low + "</p>");
-              } else {
-                $p.append("<p>" + propriete + " : " + json[propriete] + "</p>");
+          .getProcesses([$(this).text()])
+          .then(p => {
+            if (p) {
+              json = JSON.parse(JSON.stringify(p[0]))
+              var $p = $("#properties")
+              for (propriete in p[0]) {
+                if (propriete == 'creationDate' || propriete == "executionDate" || propriete == 'id') {
+                  $p.append("<p>" + propriete + " : " + json[propriete].low + "</p>");
+                } else {
+                  $p.append("<p>" + propriete + " : " + json[propriete] + "</p>");
+                }
               }
             }
-          }
-        }, "json");
+          }, "json");
 
       //Graph variable
       //query is for lineage
@@ -792,9 +759,7 @@ $(function () {
       MATCH path2=((dl)-[]-(i:Ingest)-[]-(p:Process {uuid:'`+ $(this).attr('id').split('$')[1] + `'})-[]-(d:DatasetSource)-[]-(sos:SourceOfSteam))
       WHERE (dl:DLStructuredDataset OR dl:DLSemistructuredDataset OR dl:DLUnstructuredDataset)
       RETURN path2 AS path, null as w, null as q`; //Process
-      console.log(query)
       api.getGraph(query).then(result => {
-        console.log(result)
         var nodes = new vis.DataSet(result[result.length - 1][0])
         var edges = new vis.DataSet(result[result.length - 1][1])
         var container = document.getElementById('viz')
@@ -956,13 +921,16 @@ $(function () {
         network.fit()
       })
       query2 = "MATCH path= (p:Process {name:'" + $(this).text() + "'})-[:hasSubprocess]-(t:Process) RETURN path"
-      query3 = `MATCH (p:Process {name:'` + $(this).text() + `'}) 
+      query3 = `MATCH (p:Process {name:"` + $(this).text() + `"}) 
       OPTIONAL MATCH (p)-[r3:containsOp]->(c:OperationOfProcess)
       OPTIONAL MATCH (p)-[r5:hasSubprocess]->(p1:Process)-[r1:containsOp]->(c1:OperationOfProcess)
-      OPTIONAL MATCH (c)-[f:follow]-()
-      RETURN p,r3,c,p1,r1,c1,r5,f`
+      OPTIONAL MATCH (c)-[f:followedBy]-()
+      RETURN c,c1,f, null as p, null as p1, null as r1, null as r5
+      UNION ALL
+      MATCH (p:Process {name:"` + $(this).text() + `"})-[r5:hasSubprocess]->(p1:Process)-[r1:containsOp]->(c1:OperationOfProcess)
+      OPTIONAL MATCH (c1)-[f:followedBy]-()
+      RETURN p,p1,r1,c1,r5,f, null as c`
       api.getGraph(query3).then(result => {
-        console.log(result)
         var nodes = new vis.DataSet(result[result.length - 1][0])
         var edges = new vis.DataSet(result[result.length - 1][1])
         var container = document.getElementById('viz3')
@@ -1143,21 +1111,20 @@ $(function () {
         $('#similarityButton')[0].style.display = 'none';
         document.getElementById("EntityClassButtonAnalyse").style.display = 'block';
         api
-          .getStudies([$(this).text()], typeRecherche, landmarkerList, algoNames.value)
-          .then(p => {
-            if (p) {
-              console.log(p);
-              json = JSON.parse(JSON.stringify(p[0]))
-              var $p = $("#properties")
-              for (propriete in p[0]) {
-                if (propriete == 'creationDate' || propriete == "executionDate" || propriete == 'id') {
-                  $p.append("<p>" + propriete + " : " + json[propriete].low + "</p>");
-                } else {
-                  $p.append("<p>" + propriete + " : " + json[propriete] + "</p>");
+            .getStudies([$(this).text()], typeRecherche, landmarkerList, algoNames.value)
+            .then(p => {
+              if (p) {
+                json = JSON.parse(JSON.stringify(p[0]))
+                var $p = $("#properties")
+                for (propriete in p[0]) {
+                  if (propriete == 'creationDate' || propriete == "executionDate" || propriete == 'id') {
+                    $p.append("<p>" + propriete + " : " + json[propriete].low + "</p>");
+                  } else {
+                    $p.append("<p>" + propriete + " : " + json[propriete] + "</p>");
+                  }
                 }
               }
-            }
-          }, "json");
+            }, "json");
         query = `MATCH path = allshortestpaths ((d)-[*]-(u:Study {name:'` + $(this).text() + `'}))
         WHERE NONE(n IN nodes(path) WHERE n:Tag OR n:Operation) AND (d:DLStructuredDataset OR d:DLSemistructuredDataset OR d:UnstructuredDataset)
         RETURN path` //Study
@@ -1325,25 +1292,25 @@ $(function () {
         //Get the analysis of the study clicked to create a list
         var $list = $(this).parent()
         api
-          .getAnalyses($(this).text(), '')
-          .then(p => {
-            p.sort(function (a, b) {
-              var nameA = a.name.toLowerCase(), nameB = b.name.toLowerCase()
-              if (nameA < nameB) //sort string ascending
-                return -1
-              if (nameA > nameB)
-                return 1
-              return 0 //default return value (no sorting)
-            })
-            if (p) {
-              $("#EntityClassNames").empty()
-              $list.append($("<tr class ='analyse'><td class ='analyse'>  Analyses : </td></tr>"));
-              for (var i = 0; i < p.length; i++) {
-                $list.append($("<tr class ='analyse'><td class ='analyse' id='" + p[i].name + "$" + p[i].uuid + "'>" + p[i].name + "</td></tr>"));
-                showEntityClassByAnalyse(p[i].uuid, p[i].name)
+            .getAnalyses($(this).text(), '')
+            .then(p => {
+              p.sort(function (a, b) {
+                var nameA = a[0].name.toLowerCase(), nameB = b[0].name.toLowerCase()
+                if (nameA < nameB) //sort string ascending
+                  return -1
+                if (nameA > nameB)
+                  return 1
+                return 0 //default return value (no sorting)
+              })
+              if (p) {
+                $("#EntityClassNames").empty()
+                $list.append($("<tr class ='analyse'><td class ='analyse'>  Analyses : </td></tr>"));
+                for (var i = 0; i < p.length; i++) {
+                  $list.append($("<tr class ='analyse'><td class ='analyse' id='" + p[i][0].name + "$" + p[i][0].uuid + "'>" + p[i][0].name + "</br><span style='font-size: 11px; color: #828282; font-style: italic;'>" + p[i][1].name + " | " + p[i][0].creationDate.substr(0, 10) + "</span></td></tr>"));
+                  showEntityClassByAnalyse(p[i][0].uuid, p[i][0].name)
+                }
               }
-            }
-          }, "json");
+            }, "json");
 
 
 
@@ -1375,91 +1342,88 @@ $(function () {
             }
           }
           //get dataset informations
-          console.log([$(this).text()] + ' |||| ' + typeDS)
           document.getElementById("EntityClassButtonDataset").style.display = 'block';
           api
-            .getDatabases([$(this).text()], typeDS)
-            .then(p => {
-              if (p) {
-                console.log(p[0]);
-                json = JSON.parse(JSON.stringify(p[0]))
-                var $p = $("#properties")
-                for (propriete in p[0]) {
-                  $p.append("<p>" + propriete + " : " + json[propriete] + "</p>");
+              .getDatabases([$(this).text()], typeDS)
+              .then(p => {
+                if (p) {
+                  json = JSON.parse(JSON.stringify(p[0]))
+                  var $p = $("#properties")
+                  for (propriete in p[0]) {
+                    $p.append("<p>" + propriete + " : " + json[propriete] + "</p>");
+                  }
+                  $('#EntityClassProperties').empty()
+                  //get entity class by dataset to create a list
+                  showEntityClassByDataset(p[0].uuid, p[0].name, typeDS)
                 }
-                $('#EntityClassProperties').empty()
-                //get entity class by dataset to create a list
-                showEntityClassByDataset(p[0].uuid, p[0].name, typeDS)
-              }
-            }, "json");
+              }, "json");
 
 
           var relationlist = []
           //Get the relation between this dataset and others
           api
-            .getRelationshipDSbyDataset($(this).attr('id').split('$')[1], $(this).attr('id').split('$')[2], 'RelationshipDS')
-            .then(p => {
-              console.log(p)
-              $listTab = $('#relationshipOnglet')
-              $listContent = $('#relationshipContent')
-              //Create tabs for each relation
-              for (var i = 0; i < p.length; i++) {
-                relationlist.push(p[i].name)
-                $listTab.append('<li><a data-toggle="tab" href="#' + p[i].name + '" id="a_' + p[i].name + '">' + p[i].name + '</a></li>')
-                $listContent.append(`
+              .getRelationshipDSbyDataset($(this).attr('id').split('$')[1], $(this).attr('id').split('$')[2], 'RelationshipDS')
+              .then(p => {
+                $listTab = $('#relationshipOnglet')
+                $listContent = $('#relationshipContent')
+                //Create tabs for each relation
+                for (var i = 0; i < p.length; i++) {
+                  relationlist.push(p[i].name)
+                  $listTab.append('<li><a data-toggle="tab" href="#' + p[i].name + '" id="a_' + p[i].name + '">' + p[i].name + '</a></li>')
+                  $listContent.append(`
                 <div id='`+ p[i].name + `' class="tab-pane fade">
                     <table class='relationshiptable'>
                     <tbody id='dataset_` + p[i].name + `'><tbody>
                     </table>
                 </div>`)
-              }
-              for (var i = 0; i < relationlist.length; i++) {
-                //for each relation get dataset and relation value
-                getDatasetOfRelationship($(this).attr('id').split('$')[1], $(this).attr('id').split('$')[2], relationlist[i])
-              }
-              for (var j = 0; j < relationlist.length; j++) {
-                /*console.log(relationlistAtt[j])*/
-                datasetChosed =[$(this).attr('id').split('$')[1],$(this).attr('id').split('$')[2]]
-                /*console.log(datasetChosed[0])
-                console.log(datasetChosed[1])*/
-                //add Eventlistener for each tab
-                document.getElementById("a_"+relationlist[j]).addEventListener("click",getGrapheViz4Init)
-              }
-            }, 'json')
+                }
+                for (var i = 0; i < relationlist.length; i++) {
+                  //for each relation get dataset and relation value
+                  getDatasetOfRelationship($(this).attr('id').split('$')[1], $(this).attr('id').split('$')[2], relationlist[i])
+                }
+                for (var j = 0; j < relationlist.length; j++) {
+                  /*console.log(relationlistAtt[j])*/
+                  datasetChosed = [$(this).attr('id').split('$')[1], $(this).attr('id').split('$')[2]]
+                  /*console.log(datasetChosed[0])
+                  console.log(datasetChosed[1])*/
+                  //add Eventlistener for each tab
+                  document.getElementById("a_" + relationlist[j]).addEventListener("click", getGrapheViz4Init)
+                }
+              }, 'json')
 
           //same for the attribute
           $('#relationshipAttOnglet').empty()
           $('#relationshipAttContent').empty()
           api
-            .getRelationshipAttribute($(this).attr('id').split('$')[2], '', 'relation')
-            .then(p => {
-              var relationlistAtt = []
-              // console.log(p)
-              $listTab = $('#relationshipAttOnglet')
-              $listContent = $('#relationshipAttContent')
-              for (var i = 0; i < p.length; i++) {
-                relationlistAtt.push(p[i].name)
-                console.log(p[i].name)
-                $listTab.append('<li><a data-toggle="tab" href="#' + p[i].name + '" id="a_' + p[i].name + '">' + p[i].name + '</a></li>')
-                $listContent.append(`
+              .getRelationshipAttribute($(this).attr('id').split('$')[2], '', 'relation')
+              .then(p => {
+                var relationlistAtt = []
+                // console.log(p)
+                $listTab = $('#relationshipAttOnglet')
+                $listContent = $('#relationshipAttContent')
+                for (var i = 0; i < p.length; i++) {
+                  relationlistAtt.push(p[i].name)
+                  console.log(p[i].name)
+                  $listTab.append('<li><a data-toggle="tab" href="#' + p[i].name + '" id="a_' + p[i].name + '">' + p[i].name + '</a></li>')
+                  $listContent.append(`
                 <div id='`+ p[i].name + `' class="tab-pane fade">
                     <table class='relationshiptable'>
                         <tbody id='attribute_` + p[i].name + `'><tbody>
                     </table>                
                 </div>`)
-              }
+                }
 
-              for (var i = 0; i < relationlistAtt.length; i++) {
-                // console.log(relationlistAtt[i])
-                getAnalyseOfRelationship($(this).attr('id').split('$')[2], relationlistAtt[i]);
-              }
-              for (var j = 0; j < relationlistAtt.length; j++) {
-                /*console.log(document.getElementById("a_"+relationlistAtt[j]))*/
-                trans =$(this).attr('id').split('$')[2]
-                //add eventlistener for each tab of relationshipAttribute
-                document.getElementById("a_"+relationlistAtt[j]).addEventListener("click",getGrapheViz5Init)
-              }
-            }, 'json')
+                for (var i = 0; i < relationlistAtt.length; i++) {
+                  // console.log(relationlistAtt[i])
+                  getAnalyseOfRelationship($(this).attr('id').split('$')[2], relationlistAtt[i]);
+                }
+                for (var j = 0; j < relationlistAtt.length; j++) {
+                  /*console.log(document.getElementById("a_"+relationlistAtt[j]))*/
+                  trans = $(this).attr('id').split('$')[2]
+                  //add eventlistener for each tab of relationshipAttribute
+                  document.getElementById("a_" + relationlistAtt[j]).addEventListener("click", getGrapheViz5Init)
+                }
+              }, 'json')
 
           $('#similarityResult').empty()
           $('#similarityResult').append('<table>')
@@ -1490,7 +1454,6 @@ $(function () {
           with d,p,p1,r,s
           WHERE NOT exists((p)<-[:hasSubprocess]-(:Process)-[]-(d)) AND NOT exists((p1)<-[:hasSubprocess]-(:Process)-[]-(d))
           RETURN d,p,p1,r,s`
-          console.log(query2)
           query = `MATCH path = allshortestpaths ((ds:DatasetSource)-[*]-(d))
           WHERE NONE(n IN nodes(path) WHERE n:Tag OR n:Operation) AND (d:DLStructuredDataset OR d:DLSemistructuredDataset OR d:UnstructuredDataset) AND d.uuid = '` + $(this).attr('id').split('$')[2] + `'
           RETURN path
@@ -1506,7 +1469,7 @@ $(function () {
             var options = {
               autoResize: true,
               height: '100%',
-            width: '100%',
+              width: '100%',
               nodes: {
                 shape: "dot",
                 size: 30,
@@ -1677,7 +1640,7 @@ $(function () {
             network.fit();
           })
           /*//query4 for dataset relationship
-          query4 = `MATCH (dl)<-[r1:withDataset]-()-[r2:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r3:withDataset]-()-[r4:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r5:withDataset]-(adrR)-[r6:withDataset]->(dl) 
+          query4 = `MATCH (dl)<-[r1:withDataset]-()-[r2:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r3:withDataset]-()-[r4:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r5:withDataset]-(adrR)-[r6:withDataset]->(dl)
           WHERE dl.name CONTAINS '`+ $(this).attr('id').split('$')[1] + `' and dl.uuid = '` + $(this).attr('id').split('$')[2] + `'
           AND
           (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset)
@@ -1686,7 +1649,7 @@ $(function () {
           /*query5 = `MATCH (dl)-[]-(e:EntityClass)-[]-(a),(a)-[r1:hasAttribute]-(AA:AnalysisAttribute)-[r2:useMeasure]-(RA:RelationshipAtt),(AA)-[r3:hasAttribute]-(a2)
             WHERE dl.uuid = '` + $(this).attr('id').split('$')[2] + `'
             AND
-            (a:NominalAttribute OR a:NumericAttribute OR a:Attribute)
+            (a:NominalAttribute OR a:NumericAttribute)
             RETURN DISTINCT a,r1,AA,r2,RA,a2,r3`
           console.log("query5")
           console.log(query5)
@@ -1695,7 +1658,6 @@ $(function () {
             var nodes = new vis.DataSet(p[p.length - 1][0]);
             // create an array with edges
             var edges = new vis.DataSet(p[p.length - 1][1]);
-
             // create a network
             var container = document.getElementById("viz5");
             var data = {
@@ -1732,14 +1694,12 @@ $(function () {
             var nodes = new vis.DataSet(p[p.length - 1][0]);
             // create an array with edges
             var edges = new vis.DataSet(p[p.length - 1][1]);
-
             // create a network
             var container = document.getElementById("viz4");
             var data = {
               nodes: nodes,
               edges: edges,
             };
-
             var network = new vis.Network(container, data, options);
             network.body.emitter.emit('_dataChanged')
             network.redraw()
@@ -1759,20 +1719,17 @@ $(function () {
             $('#relationshipAttOnglet').empty()
             $('#relationshipAttContent').empty()
             $('#attributeList').empty()
-            console.log("123")
-            console.log([$(this).text()])
             document.getElementById("EntityClassButtonAnalyse").style.display = 'block';
             api
-              .getAnalyses('', $(this).attr('id').split('$')[0], $(this).attr('id').split('$')[1])
-              .then(p => {
-                console.log(p)
-                json = JSON.parse(JSON.stringify(p[0]))
-                var $p = $("#properties")
-                for (propriete in p[0]) {
+                .getAnalyses('', $(this).attr('id').split('$')[0], $(this).attr('id').split('$')[1])
+                .then(p => {
+                  json = JSON.parse(JSON.stringify(p[0][0]))
+                  var $p = $("#properties")
+                  for (propriete in p[0][0]) {
 
-                  $p.append("<p>" + propriete + " : " + json[propriete] + "</p>");
-                }
-              }, "json");
+                    $p.append("<p>" + propriete + " : " + json[propriete] + "</p>");
+                  }
+                }, "json");
 
             setTimeout(() => { $("#analyseNames").closest(".collapse").collapse('show') }, 500);
 
@@ -1804,9 +1761,7 @@ $(function () {
             api.getNominalAttributebyAnalysis($(this).attr('id').split('$')[1]).then(na => {
               var $list = $('#AttributesNames')
               $list.append('"<tr><td><h4>Nominal Attribute</h4></td></tr>')
-              console.log(na)
               for (var i = 0; i < na.length; i++) {
-                console.log(na[i].name)
                 $list.append("<tr><td class='Attribute' id='" + na[i].name + "$" + $(this).attr('id').split('$')[1] + "$nominal'>" + na[i].name + "</td></tr>")
               }
             }, 'json');
@@ -1814,7 +1769,6 @@ $(function () {
             api.getNumericAttributebyAnalysis($(this).attr('id').split('$')[1]).then(na => {
               var $list = $('#AttributesNames')
               $list.append('<tr><td><h4>Numeric Attribute</h4></td></tr>')
-              console.log(na)
               for (var i = 0; i < na.length; i++) {
                 $list.append("<tr><td class='Attribute' id='" + na[i].name + "$" + $(this).attr('id').split('$')[1] + "$numeric'>" + na[i].name + "</td></tr>")
               }
@@ -1825,35 +1779,35 @@ $(function () {
             $('#relationshipAttOnglet').empty()
             $('#relationshipAttContent').empty()
             api
-              .getRelationshipAttribute($(this).attr('id').split('$')[1], '', 'relation')
-              .then(p => {
-                var relationlistAtt = []
-                console.log(p)
-                $listTab = $('#relationshipAttOnglet')
-                $listContent = $('#relationshipAttContent')
-                for (var i = 0; i < p.length; i++) {
-                  relationlistAtt.push(p[i].name)
-                  $listTab.append('<li><a data-toggle="tab" href="#' + p[i].name + '" id="a_' + p[i].name + '">' + p[i].name + '</a></li>')
+                .getRelationshipAttribute($(this).attr('id').split('$')[1], '', 'relation')
+                .then(p => {
+                  var relationlistAtt = []
+                  console.log(p)
+                  $listTab = $('#relationshipAttOnglet')
+                  $listContent = $('#relationshipAttContent')
+                  for (var i = 0; i < p.length; i++) {
+                    relationlistAtt.push(p[i].name)
+                    $listTab.append('<li><a data-toggle="tab" href="#' + p[i].name + '" id="a_' + p[i].name + '">' + p[i].name + '</a></li>')
 
-                  $listContent.append(`
+                    $listContent.append(`
                 <div id='`+ p[i].name + `' class="tab-pane fade">
                     <table class='relationshiptable'>
                         <tbody id='attribute_` + p[i].name + `'><tbody>
                     </table>
                 </div>`)
-                }
-                for (var i = 0; i < relationlistAtt.length; i++) {
-                  console.log($(this).attr('id').split('$')[1])
-                  getAnalyseOfRelationship($(this).attr('id').split('$')[1], relationlistAtt[i]);
-                }
-                for (var j = 0; j < relationlistAtt.length; j++) {
-                  /*console.log(j)
-                  console.log(relationlistAtt[j])
-                  console.log(document.getElementById("a_"+relationlistAtt[j]))*/
-                  trans =$(this).attr('id').split('$')[1]
-                  document.getElementById("a_"+relationlistAtt[j]).addEventListener("click",getGrapheViz5Init)
-                }
-              }, 'json')
+                  }
+                  for (var i = 0; i < relationlistAtt.length; i++) {
+                    console.log($(this).attr('id').split('$')[1])
+                    getAnalyseOfRelationship($(this).attr('id').split('$')[1], relationlistAtt[i]);
+                  }
+                  for (var j = 0; j < relationlistAtt.length; j++) {
+                    /*console.log(j)
+                    console.log(relationlistAtt[j])
+                    console.log(document.getElementById("a_"+relationlistAtt[j]))*/
+                    trans = $(this).attr('id').split('$')[1]
+                    document.getElementById("a_" + relationlistAtt[j]).addEventListener("click", getGrapheViz5Init)
+                  }
+                }, 'json')
 
 
             //Query part
@@ -2041,14 +1995,12 @@ $(function () {
               var nodes = new vis.DataSet(p[p.length - 1][0]);
               // create an array with edges
               var edges = new vis.DataSet(p[p.length - 1][1]);
-
               // create a network
               var container = document.getElementById("viz5");
               var data = {
                 nodes: nodes,
                 edges: edges,
               };
-
               var network = new vis.Network(container, data, options);
               network.body.emitter.emit('_dataChanged')
               network.redraw()
@@ -2086,7 +2038,6 @@ $(function () {
     // this will contain a reference to the checkbox
     if (this.checked) {
       typeRecherche.push(this.id);
-      console.log("cases cochées : " + typeRecherche);
       //Check the type of checkbox
       if (typeRecherche.includes("Structured") || typeRecherche.includes("Semi-Structured") || typeRecherche.includes("Unstructured")) {
         $("#dbNames").empty()
@@ -2095,10 +2046,82 @@ $(function () {
       if (typeRecherche.includes("supervised") || typeRecherche.includes("descriptive") || typeRecherche.includes("diagnostic") || typeRecherche.includes("predictive") || typeRecherche.includes("prescriptive")) {
         $("#analyseNames").empty()
         showStudies(tagsinput, typeRecherche);
+        $('#algoNames')[0].style.display = 'none'
+        $('#algosupervised')[0].style.display = 'none'
+        $('#algoUnsupervised')[0].style.display = 'none'
+        $('#AlgoReinforcement')[0].style.display = 'none'
+        $('#parameter')[0].style.display = 'none'
+        $('#evaluation')[0].style.display = 'none'
+        $('#landmarker')[0].style.display = 'none'
+        $('label[for="algoNames"]')[0].style.display = 'none'
+        $('label[for="algosupervised"]')[0].style.display = 'none'
+        $('label[for="algoUnsupervised"]')[0].style.display = 'none'
+        $('label[for="algoReinforcement"]')[0].style.display = 'none'
+        if (typeRecherche.includes("supervised")) {
+          $('#algoNames')[0].style.display = 'inline-block'
+          $('#algosupervised')[0].style.display = 'inline-block'
+          $('#algoUnsupervised')[0].style.display = 'inline-block'
+          $('#AlgoReinforcement')[0].style.display = 'inline-block'
+          $('#parameter')[0].style.display = 'inline-block'
+          $('#evaluation')[0].style.display = 'inline-block'
+          $('#landmarker')[0].style.display = 'inline-block'
+          $('label[for="algoNames"]')[0].style.display = 'inline-block'
+          $('label[for="algosupervised"]')[0].style.display = 'inline-block'
+          $('label[for="algoUnsupervised"]')[0].style.display = 'inline-block'
+          $('label[for="algoReinforcement"]')[0].style.display = 'inline-block'
+        }
       }
       if (typeRecherche.includes("algosupervised") || typeRecherche.includes("algoUnsupervised") || typeRecherche.includes("algoReinforcement")) {
         $("#analyseNames").empty()
         showStudies(tagsinput, typeRecherche);
+      }
+      if (typeRecherche.includes("machineLearning") || (typeRecherche.includes("machineLearning") && typeRecherche.includes("otherAnalysis"))) {
+        showStudies(tagsinput, typeRecherche);
+        $('#supervised')[0].style.display = 'inline-block'
+        $('#descriptive')[0].style.display = 'inline-block'
+        $('#diagnostic')[0].style.display = 'inline-block'
+        $('#predictive')[0].style.display = 'inline-block'
+        $('#prescriptive')[0].style.display = 'inline-block'
+        $('label[for="supervised"]')[0].style.display = 'inline-block'
+        $('label[for="descriptive"]')[0].style.display = 'inline-block'
+        $('label[for="diagnostic"]')[0].style.display = 'inline-block'
+        $('label[for="predictive"]')[0].style.display = 'inline-block'
+        $('label[for="prescriptive"]')[0].style.display = 'inline-block'
+        $('#algoNames')[0].style.display = 'inline-block'
+        $('#algosupervised')[0].style.display = 'inline-block'
+        $('#algoUnsupervised')[0].style.display = 'inline-block'
+        $('#AlgoReinforcement')[0].style.display = 'inline-block'
+        $('#parameter')[0].style.display = 'inline-block'
+        $('#evaluation')[0].style.display = 'inline-block'
+        $('#landmarker')[0].style.display = 'inline-block'
+        $('label[for="algoNames"]')[0].style.display = 'inline-block'
+        $('label[for="algosupervised"]')[0].style.display = 'inline-block'
+        $('label[for="algoUnsupervised"]')[0].style.display = 'inline-block'
+        $('label[for="algoReinforcement"]')[0].style.display = 'inline-block'
+      }
+      if (typeRecherche.includes("otherAnalysis") && !(typeRecherche.includes("machineLearning"))) {
+        showStudies(tagsinput, typeRecherche);
+        $('#supervised')[0].style.display = 'none'
+        $('#descriptive')[0].style.display = 'none'
+        $('#diagnostic')[0].style.display = 'none'
+        $('#predictive')[0].style.display = 'none'
+        $('#prescriptive')[0].style.display = 'none'
+        $('label[for="supervised"]')[0].style.display = 'none'
+        $('label[for="descriptive"]')[0].style.display = 'none'
+        $('label[for="diagnostic"]')[0].style.display = 'none'
+        $('label[for="predictive"]')[0].style.display = 'none'
+        $('label[for="prescriptive"]')[0].style.display = 'none'
+        $('#algoNames')[0].style.display = 'none'
+        $('#algosupervised')[0].style.display = 'none'
+        $('#algoUnsupervised')[0].style.display = 'none'
+        $('#AlgoReinforcement')[0].style.display = 'none'
+        $('#parameter')[0].style.display = 'none'
+        $('#evaluation')[0].style.display = 'none'
+        $('#landmarker')[0].style.display = 'none'
+        $('label[for="algoNames"]')[0].style.display = 'none'
+        $('label[for="algosupervised"]')[0].style.display = 'none'
+        $('label[for="algoUnsupervised"]')[0].style.display = 'none'
+        $('label[for="algoReinforcement"]')[0].style.display = 'none'
       }
     } else {
       //Remove the filtre of the unchecked box
@@ -2121,12 +2144,113 @@ $(function () {
         if (typeRecherche.includes("supervised") || typeRecherche.includes("descriptive") || typeRecherche.includes("diagnostic") || typeRecherche.includes("predictive") || typeRecherche.includes("prescriptive")) {
           $("#analyseNames").empty()
           showStudies(tagsinput, typeRecherche);
+          $('#algoNames')[0].style.display = 'none'
+          $('#algosupervised')[0].style.display = 'none'
+          $('#algoUnsupervised')[0].style.display = 'none'
+          $('#AlgoReinforcement')[0].style.display = 'none'
+          $('#parameter')[0].style.display = 'none'
+          $('#evaluation')[0].style.display = 'none'
+          $('#landmarker')[0].style.display = 'none'
+          $('label[for="algoNames"]')[0].style.display = 'none'
+          $('label[for="algosupervised"]')[0].style.display = 'none'
+          $('label[for="algoUnsupervised"]')[0].style.display = 'none'
+          $('label[for="algoReinforcement"]')[0].style.display = 'none'
+          if (typeRecherche.includes("supervised")) {
+            $('#algoNames')[0].style.display = 'inline-block'
+            $('#algosupervised')[0].style.display = 'inline-block'
+            $('#algoUnsupervised')[0].style.display = 'inline-block'
+            $('#AlgoReinforcement')[0].style.display = 'inline-block'
+            $('#parameter')[0].style.display = 'inline-block'
+            $('#evaluation')[0].style.display = 'inline-block'
+            $('#landmarker')[0].style.display = 'inline-block'
+            $('label[for="algoNames"]')[0].style.display = 'inline-block'
+            $('label[for="algosupervised"]')[0].style.display = 'inline-block'
+            $('label[for="algoUnsupervised"]')[0].style.display = 'inline-block'
+            $('label[for="algoReinforcement"]')[0].style.display = 'inline-block'
+          }
         }
         if (typeRecherche.includes("algosupervised") || typeRecherche.includes("algoUnsupervised") || typeRecherche.includes("algoReinforcement")) {
           $("#analyseNames").empty()
           showStudies(tagsinput, typeRecherche);
         }
+        if (typeRecherche.includes("machineLearning") || (typeRecherche.includes("machineLearning") && typeRecherche.includes("otherAnalysis"))) {
+          showProcesses(tagsinput, typeRecherche)
+          showStudies(tagsinput, typeRecherche)
+          showDatabases(tagsinput, typeRecherche)
+          $('#supervised')[0].style.display = 'inline-block'
+          $('#descriptive')[0].style.display = 'inline-block'
+          $('#diagnostic')[0].style.display = 'inline-block'
+          $('#predictive')[0].style.display = 'inline-block'
+          $('#prescriptive')[0].style.display = 'inline-block'
+          $('label[for="supervised"]')[0].style.display = 'inline-block'
+          $('label[for="descriptive"]')[0].style.display = 'inline-block'
+          $('label[for="diagnostic"]')[0].style.display = 'inline-block'
+          $('label[for="predictive"]')[0].style.display = 'inline-block'
+          $('label[for="prescriptive"]')[0].style.display = 'inline-block'
+          $('#algoNames')[0].style.display = 'inline-block'
+          $('#algosupervised')[0].style.display = 'inline-block'
+          $('#algoUnsupervised')[0].style.display = 'inline-block'
+          $('#AlgoReinforcement')[0].style.display = 'inline-block'
+          $('#parameter')[0].style.display = 'inline-block'
+          $('#evaluation')[0].style.display = 'inline-block'
+          $('#landmarker')[0].style.display = 'inline-block'
+          $('label[for="algoNames"]')[0].style.display = 'inline-block'
+          $('label[for="algosupervised"]')[0].style.display = 'inline-block'
+          $('label[for="algoUnsupervised"]')[0].style.display = 'inline-block'
+          $('label[for="algoReinforcement"]')[0].style.display = 'inline-block'
+        }
+        if (typeRecherche.includes("otherAnalysis") && !(typeRecherche.includes("machineLearning"))) {
+          showProcesses(tagsinput, typeRecherche)
+          showStudies(tagsinput, typeRecherche)
+          showDatabases(tagsinput, typeRecherche)
+          $('#supervised')[0].style.display = 'none'
+          $('#descriptive')[0].style.display = 'none'
+          $('#diagnostic')[0].style.display = 'none'
+          $('#predictive')[0].style.display = 'none'
+          $('#prescriptive')[0].style.display = 'none'
+          $('label[for="supervised"]')[0].style.display = 'none'
+          $('label[for="descriptive"]')[0].style.display = 'none'
+          $('label[for="diagnostic"]')[0].style.display = 'none'
+          $('label[for="predictive"]')[0].style.display = 'none'
+          $('label[for="prescriptive"]')[0].style.display = 'none'
+          $('#algoNames')[0].style.display = 'none'
+          $('#algosupervised')[0].style.display = 'none'
+          $('#algoUnsupervised')[0].style.display = 'none'
+          $('#AlgoReinforcement')[0].style.display = 'none'
+          $('#parameter')[0].style.display = 'none'
+          $('#evaluation')[0].style.display = 'none'
+          $('#landmarker')[0].style.display = 'none'
+          $('label[for="algoNames"]')[0].style.display = 'none'
+          $('label[for="algosupervised"]')[0].style.display = 'none'
+          $('label[for="algoUnsupervised"]')[0].style.display = 'none'
+          $('label[for="algoReinforcement"]')[0].style.display = 'none'
+        }
       }
+      console.log('hello there : ' + typeRecherche.includes("otherAnalysis") + ' and ' + typeRecherche.includes("machineLearning"))
+      if (!(typeRecherche.includes("otherAnalysis")) && !(typeRecherche.includes("machineLearning"))) {
+        $('#supervised')[0].style.display = 'none'
+        $('#descriptive')[0].style.display = 'none'
+        $('#diagnostic')[0].style.display = 'none'
+        $('#predictive')[0].style.display = 'none'
+        $('#prescriptive')[0].style.display = 'none'
+        $('label[for="supervised"]')[0].style.display = 'none'
+        $('label[for="descriptive"]')[0].style.display = 'none'
+        $('label[for="diagnostic"]')[0].style.display = 'none'
+        $('label[for="predictive"]')[0].style.display = 'none'
+        $('label[for="prescriptive"]')[0].style.display = 'none'
+        $('#algoNames')[0].style.display = 'inline-block'
+        $('#algosupervised')[0].style.display = 'inline-block'
+        $('#algoUnsupervised')[0].style.display = 'inline-block'
+        $('#AlgoReinforcement')[0].style.display = 'inline-block'
+        $('#parameter')[0].style.display = 'inline-block'
+        $('#evaluation')[0].style.display = 'inline-block'
+        $('#landmarker')[0].style.display = 'inline-block'
+        $('label[for="algoNames"]')[0].style.display = 'inline-block'
+        $('label[for="algosupervised"]')[0].style.display = 'inline-block'
+        $('label[for="algoUnsupervised"]')[0].style.display = 'inline-block'
+        $('label[for="algoReinforcement"]')[0].style.display = 'inline-block'
+      }
+
     }
   });
 
@@ -2143,7 +2267,6 @@ $(function () {
       }
       showProcesses(tagsinput, langList, pDate, typeOpe, exeEnvList);
     }
-    console.log(typeOpe);
   });
 
   //Event for checkbox in dropdown menu (mainly for filter)
@@ -2159,10 +2282,9 @@ $(function () {
       }
       showProcesses(tagsinput, langList, pDate, typeOpe, exeEnvList);
     }
-    console.log(langList);
   });
 
-//Event for checkbox in dropdown menu (mainly for filter)
+  //Event for checkbox in dropdown menu (mainly for filter)
   $('#exeEnvDropdown').on('click', 'input', function () {
     $("#processNames").empty();
     if (this.checked) {
@@ -2175,7 +2297,6 @@ $(function () {
       }
       showProcesses(tagsinput, langList, pDate, typeOpe, exeEnvList);
     }
-    console.log(exeEnvList);
   });
 
   //Event for checkbox in dropdown menu (mainly for filter)
@@ -2193,21 +2314,23 @@ $(function () {
       $("#analyseNames").empty()
       showStudies(tagsinput, typeRecherche, landmarkerList);
     }
-    console.log(landmarkerList);
   });
 
   //Event to get the date if changed for date filter
   $('#dsDate').change(function () {
-    console.log($(this).val());
     dsDate = $(this).val();
     showDatabases(tagsinput, '', dsDate);
   });
 
   $('#pDate').change(function () {
     $("#processNames").empty();
-    console.log($(this).val());
     pDate = $(this).val();
     showProcesses(tagsinput, langList, pDate);
+  });
+
+  $('#aDate').change(function () {
+    aDate = $(this).val();
+    showStudies(tagsinput, '', aDate);
   });
 
 
@@ -2216,6 +2339,7 @@ $(function () {
     var display = $('#moreDSFilter')[0].style.display;
     if (display === "none") {
       $('#moreDSFilter')[0].style.display = "block";
+
     } else {
       $('#moreDSFilter')[0].style.display = "none";
     }
@@ -2421,7 +2545,7 @@ $(function () {
   //Changed: for click in the drop-down
   $("#landmarkerInput").keyup(function () {
     var elt2 = document.getElementById("DropdownMenulandmarker");
-    elt2.innerText=""
+    elt2.innerText = ""
     var input, filter, a, i;
     input = document.getElementById("landmarkerInput");
     filter = input.value.toUpperCase();
@@ -2430,8 +2554,8 @@ $(function () {
     for (i = 0; i < a.length; i++) {
       txtValue = a[i].textContent || a[i].innerText;
       if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        var idlandmarker= txtValue.substr(1,txtValue.length-1)
-        elt2.insertAdjacentHTML('beforeend', "<li><a name='landmarkerLink' id='landmarker_"+idlandmarker+"'>"+ idlandmarker +"</a></li>");
+        var idlandmarker = txtValue.substr(1, txtValue.length - 1)
+        elt2.insertAdjacentHTML('beforeend', "<li><a name='landmarkerLink' id='landmarker_" + idlandmarker + "'>" + idlandmarker + "</a></li>");
       }
     }
     var landmarkerLink = document.getElementsByName("landmarkerLink");
@@ -2443,7 +2567,7 @@ $(function () {
   //Add: for click in the drop-down of used operation
   $("#usedOpeInput").keyup(function () {
     var elt2 = document.getElementById("DropdownMenuusedop");
-    elt2.innerText=""
+    elt2.innerText = ""
     var input, filter, a, i;
     input = document.getElementById("usedOpeInput");
     filter = input.value.toUpperCase();
@@ -2452,10 +2576,10 @@ $(function () {
     console.log(filter)
     for (i = 0; i < a.length; i++) {
       txtValue = a[i].textContent || a[i].innerText;
-      var idusedop= txtValue.substr(1,txtValue.length-1)
+      var idusedop = txtValue.substr(1, txtValue.length - 1)
       if (idusedop.toUpperCase().indexOf(filter) > -1) {
         var elt2 = document.getElementById("DropdownMenuusedop");
-        elt2.insertAdjacentHTML('beforeend', "<li><a name='usedOpLink' id='usedOperation_"+idusedop+"'>"+ idusedop +"</a></li>");
+        elt2.insertAdjacentHTML('beforeend', "<li><a name='usedOpLink' id='usedOperation_" + idusedop + "'>" + idusedop + "</a></li>");
       }
     }
     var usedOpLink = document.getElementsByName("usedOpLink");
@@ -2467,7 +2591,7 @@ $(function () {
   //Add: for click in the drop-down of execution environment
   $("#exeEnvInput").keyup(function () {
     var elt2 = document.getElementById("DropdownMenuexeEnv");
-    elt2.innerText=""
+    elt2.innerText = ""
     var input, filter, ul, li, a, i;
     input = document.getElementById("exeEnvInput");
     filter = input.value.toUpperCase();
@@ -2475,10 +2599,10 @@ $(function () {
     a = div.getElementsByClassName("exeEnvList");
     for (i = 0; i < a.length; i++) {
       txtValue = a[i].textContent || a[i].innerText;
-      var idexeEnv= txtValue.substr(2,txtValue.length-1)
+      var idexeEnv = txtValue.substr(2, txtValue.length - 1)
       if (idexeEnv.toUpperCase().indexOf(filter) > -1) {
         var elt2 = document.getElementById("DropdownMenuexeEnv");
-        elt2.insertAdjacentHTML('beforeend', "<li><a name='exeEnvLink' id='exeEnv_"+idexeEnv+"'>"+ idexeEnv +"</a></li>");
+        elt2.insertAdjacentHTML('beforeend', "<li><a name='exeEnvLink' id='exeEnv_" + idexeEnv + "'>" + idexeEnv + "</a></li>");
       }
     }
     var exeEnvLink = document.getElementsByName("exeEnvLink");
@@ -2489,7 +2613,7 @@ $(function () {
 
   $("#evaluationInput").keyup(function () {
     var elt2 = document.getElementById("DropdownMenuevaluation");
-    elt2.innerText=""
+    elt2.innerText = ""
     var input, filter, a, i;
     input = document.getElementById("evaluationInput");
     filter = input.value.toUpperCase();
@@ -2498,8 +2622,8 @@ $(function () {
     for (i = 0; i < a.length; i++) {
       txtValue = a[i].textContent || a[i].innerText;
       if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        var idevaluation= txtValue.substr(1,txtValue.length-1)
-        elt2.insertAdjacentHTML('beforeend', "<li><a name='evaluationLink' id='evaluation_"+idevaluation+"'>"+ idevaluation +"</a></li>");
+        var idevaluation = txtValue.substr(1, txtValue.length - 1)
+        elt2.insertAdjacentHTML('beforeend', "<li><a name='evaluationLink' id='evaluation_" + idevaluation + "'>" + idevaluation + "</a></li>");
       }
     }
     var evaluationLink = document.getElementsByName("evaluationLink");
@@ -2510,7 +2634,7 @@ $(function () {
 
   $("#parameterInput").keyup(function () {
     var elt2 = document.getElementById("DropdownMenuparameter");
-    elt2.innerText=""
+    elt2.innerText = ""
     var input, filter, a, i;
     input = document.getElementById("parameterInput");
     filter = input.value.toUpperCase();
@@ -2519,8 +2643,8 @@ $(function () {
     for (i = 0; i < a.length; i++) {
       txtValue = a[i].textContent || a[i].innerText;
       if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        var idparameter= txtValue.substr(1,txtValue.length-1)
-        elt2.insertAdjacentHTML('beforeend', "<li><a name='parameterLink' id='parameter_"+idparameter+"'>"+ idparameter +"</a></li>");
+        var idparameter = txtValue.substr(1, txtValue.length - 1)
+        elt2.insertAdjacentHTML('beforeend', "<li><a name='parameterLink' id='parameter_" + idparameter + "'>" + idparameter + "</a></li>");
       }
     }
     var parameterLink = document.getElementsByName("parameterLink");
@@ -2530,26 +2654,27 @@ $(function () {
 
   });
 
+
   //Event to search within result of dataset or studies a specific entity linked to them
-  $("#inputECANames").keyup(function () {
+  $("#inputECANames").keyup('compositionend', function () {
     $("#dbNames").empty();
-    inputECAnames = document.getElementById("inputECANames");
-    console.log(inputECAnames.value)
-    showDatabases(tagsinput, "", dsDate, "", "", inputECAnames.value)
+    clearTimeout(timer);  //clear any running timeout on key up
+    timer = setTimeout(function () {
+      inputECAnames = document.getElementById("inputECANames");
+      showDatabases(tagsinput, "", dsDate, "", "", inputECAnames.value);
+    }, 1000);
   });
 
   $("#algoNames").keyup(function () {
     $("#analyseNames").empty();
     algoNames = document.getElementById("algoNames");
-    console.log(algoNames.value)
-    showStudies(tagsinput, typeRecherche, landmarkerList, algoNames.value)
+    showStudies(tagsinput, typeRecherche, aDate,landmarkerList, algoNames.value)
   });
 
   $("#omNames").keyup(function () {
     $("#analyseNames").empty();
     omNames = document.getElementById("omNames");
-    console.log(omNames.value)
-    showStudies(tagsinput, typeRecherche, landmarkerList, algoNames.value, omNames.value)
+    showStudies(tagsinput, typeRecherche, aDate, landmarkerList, algoNames.value, omNames.value)
   });
 
 
@@ -2581,7 +2706,6 @@ async function showSimilarity() {
 async function showEntityClassByAnalyse(anUuid, anName) {
   $("#EntityClassNames").empty()
   api.getEntityClassByAnalyse(anName, anUuid).then(ec => {
-    console.log(ec)
     $listEc = $("#EntityClassNames")
     for (var i = 0; i < ec.length; i++) {
       if (optionEntityClass.indexOf(ec[i].name) === -1) {
@@ -2612,18 +2736,17 @@ async function showEntityClassByDataset(dsId, dsName, typeDS) {
 //Function to get relationship value between two dataset
 async function getAnalysisRelationshipDS(ds1Uuid, ds2uuid, name, dsName, ds2Name, mapRelationAttDS, resolve) {
   api
-    .getRelationshipDSAnalysisbyDataset(ds1Uuid, ds2uuid, name)
-    .then(p => {
-      if (p !== undefined && p.length > 0) {
-        console.log('key : ' + dsName + '&' + ds2Name + '&' + name + ' ||| value : ' + p[0].value)
-        mapRelationAttDS.set(dsName + '&' + ds2Name + '&' + name, parseFloat(p[0].value))
-      } else {
-        mapRelationAttDS.set(nameAtt + '&' + nameAtt2 + '&' + name, '');
-      }
-      if (resolve !== undefined) {
-        resolve();
-      }
-    }, 'json')
+      .getRelationshipDSAnalysisbyDataset(ds1Uuid, ds2uuid, name)
+      .then(p => {
+        if (p !== undefined && p.length > 0) {
+          mapRelationAttDS.set(dsName + '&' + ds2Name + '&' + name, parseFloat(p[0].value))
+        } else {
+          mapRelationAttDS.set(nameAtt + '&' + nameAtt2 + '&' + name, '');
+        }
+        if (resolve !== undefined) {
+          resolve();
+        }
+      }, 'json')
 }
 
 //Function to get all dataset linked by a relation with the target
@@ -2631,68 +2754,67 @@ async function getDatasetOfRelationship(dsName, dsId, relationlist) {
   var promisesDS = [];
   var mapRelationAttDS = new Map;
   api
-    .getRelationshipDSbyDataset(dsName, dsId, 'Dataset', relationlist)
-    .then(p => {
-      $listHead = $('#dataset_' + relationlist)
-      console.log($listHead)
-      for (var i = 0; i < p.length; i++) {
-        if (p[i].uuid != dsId) {
-          promisesDS.push(new Promise((resolve, reject) => { getAnalysisRelationshipDS(p[i].uuid, dsId, $listHead.closest('div').attr('id'), dsName, p[i].name, mapRelationAttDS, resolve); }));
+      .getRelationshipDSbyDataset(dsName, dsId, 'Dataset', relationlist)
+      .then(p => {
+        $listHead = $('#dataset_' + relationlist)
+        for (var i = 0; i < p.length; i++) {
+          if (p[i].uuid != dsId) {
+            promisesDS.push(new Promise((resolve, reject) => { getAnalysisRelationshipDS(p[i].uuid, dsId, $listHead.closest('div').attr('id'), dsName, p[i].name, mapRelationAttDS, resolve); }));
 
+          }
         }
-      }
-      Promise.all(promisesDS).then(() => {
-        console.log('Promise finit : ' + mapRelationAttDS.size);
-        var valueMin = Math.min(...mapRelationAttDS.values())
-        var valueMax = Math.max(...mapRelationAttDS.values())
-        var arrayObj=Array.from(mapRelationAttDS);
-        arrayObj.sort(function(a,b){return b[1]-a[1]})
-        var typerelationshipDS=""
-        for (var i=0; i<arrayObj.length; i++){
-          $listBody = $('#dataset_' + arrayObj[i][0].split('&')[2])
-          console.log(arrayObj[i][0].split('&')[2])
-          typerelationshipDS = arrayObj[i][0].split('&')[2]
-          if (arrayObj[i][1]) {
-            var valueNumber = Number(arrayObj[i][1]).toFixed(5)
-            if (arrayObj[i][1] == valueMin) {
-              $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : red">' + valueNumber + '</span></td></tr>')
-            } else {
-              if (arrayObj[i][1] == valueMax) {
-                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : green">' + valueNumber + '</span></td></tr>')
+        Promise.all(promisesDS).then(() => {
+          console.log('Promise finit : ' + mapRelationAttDS.size);
+          var valueMin = Math.min(...mapRelationAttDS.values())
+          var valueMax = Math.max(...mapRelationAttDS.values())
+          var arrayObj = Array.from(mapRelationAttDS);
+          arrayObj.sort(function (a, b) { return b[1] - a[1] })
+          var typerelationshipDS = ""
+          for (var i = 0; i < arrayObj.length; i++) {
+            $listBody = $('#dataset_' + arrayObj[i][0].split('&')[2])
+            console.log(arrayObj[i][0].split('&')[2])
+            typerelationshipDS = arrayObj[i][0].split('&')[2]
+            if (arrayObj[i][1]) {
+              var valueNumber = Number(arrayObj[i][1]).toFixed(5)
+              if (arrayObj[i][1] == valueMin) {
+                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : red">' + valueNumber + '</span></td></tr>')
               } else {
-                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + valueNumber + '</td></tr>')
+                if (arrayObj[i][1] == valueMax) {
+                  $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : green">' + valueNumber + '</span></td></tr>')
+                } else {
+                  $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + valueNumber + '</td></tr>')
+                }
               }
             }
           }
-        }
-        $rangeBody = $('#' + typerelationshipDS)
-        var valueMaxRounding = valueMax.toFixed(5)
-        var valueMinRounding = valueMin.toFixed(5)
-        $rangeBody.append("</br><p><b>Threshold</b>:<span id='seuil_"+ typerelationshipDS +"'></span><input type='button' id='b_"+ typerelationshipDS +"' name='blue' value='Show part blue'/></p><input type='range' id='r_"+ typerelationshipDS +"' value='"+valueMaxRounding+"' max='"+valueMaxRounding+"' min='"+valueMinRounding+"' step='0.00001'/><div class='row'> <div class='col-md-6'>"+valueMinRounding+"</div><div class='col-md-6'><div class='text-right'>"+valueMaxRounding+"</div></div></div>")
-        document.getElementById('r_'+typerelationshipDS).addEventListener("change",getGrapheViz4Seuil)
-        document.getElementById('b_'+typerelationshipDS).addEventListener("click",changRange)
-        document.getElementById('b_'+typerelationshipDS).addEventListener("click",getGrapheViz4Seuil)
-      });
-    }, 'json')
+          $rangeBody = $('#' + typerelationshipDS)
+          var valueMaxRounding = valueMax.toFixed(5)
+          var valueMinRounding = valueMin.toFixed(5)
+          $rangeBody.append("</br><p><b>Threshold</b>:<span id='seuil_" + typerelationshipDS + "'></span><input type='button' id='b_" + typerelationshipDS + "' name='blue' value='Show part blue'/></p><input type='range' id='r_" + typerelationshipDS + "' value='" + valueMaxRounding + "' max='" + valueMaxRounding + "' min='" + valueMinRounding + "' step='0.00001'/><div class='row'> <div class='col-md-6'>" + valueMinRounding + "</div><div class='col-md-6'><div class='text-right'>" + valueMaxRounding + "</div></div></div>")
+          document.getElementById('r_' + typerelationshipDS).addEventListener("change", getGrapheViz4Seuil)
+          document.getElementById('b_' + typerelationshipDS).addEventListener("click", changRange)
+          document.getElementById('b_' + typerelationshipDS).addEventListener("click", getGrapheViz4Seuil)
+        });
+      }, 'json')
 }
 
 //Function to draw relationshipDataset
 function getGrapheViz4Seuil() {
   console.log(this.id.substring(2))
-  var value = document.getElementById('r_'+this.id.substring(2)).value ;
-  document.getElementById('seuil_'+this.id.substring(2)).innerHTML = value;
-  console.log(document.getElementById('b_'+this.id.substring(2)).value)
-  if (document.getElementById('b_'+this.id.substring(2)).name=='blue'){
-  query4 = `MATCH (dl)<-[r1:withDataset]-()-[r2:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r3:withDataset]-()-[r4:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r5:withDataset]-(adrR)-[r6:withDataset]->(dl),(adrR)-[r7]->(rDS:RelationshipDS)
-          WHERE dl.name CONTAINS '`+ datasetChosed[0] + `' and dl.uuid = '` + datasetChosed[1] + `'
-          AND
-          (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and round(toFloat(adrR.value),5)<=toFloat(`+value +`)
-          RETURN DISTINCT dl,rDS,autreDS,adrR,r1,r2,r3,r4,r5,r6,r7`
-  }else{
+  var value = document.getElementById('r_' + this.id.substring(2)).value;
+  document.getElementById('seuil_' + this.id.substring(2)).innerHTML = value;
+  console.log(document.getElementById('b_' + this.id.substring(2)).value)
+  if (document.getElementById('b_' + this.id.substring(2)).name == 'blue') {
     query4 = `MATCH (dl)<-[r1:withDataset]-()-[r2:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r3:withDataset]-()-[r4:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r5:withDataset]-(adrR)-[r6:withDataset]->(dl),(adrR)-[r7]->(rDS:RelationshipDS)
           WHERE dl.name CONTAINS '`+ datasetChosed[0] + `' and dl.uuid = '` + datasetChosed[1] + `'
           AND
-          (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and round(toFloat(adrR.value),5)>=toFloat(`+value +`)
+          (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and round(toFloat(adrR.value),5)<=toFloat(` + value + `)
+          RETURN DISTINCT dl,rDS,autreDS,adrR,r1,r2,r3,r4,r5,r6,r7`
+  } else {
+    query4 = `MATCH (dl)<-[r1:withDataset]-()-[r2:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r3:withDataset]-()-[r4:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r5:withDataset]-(adrR)-[r6:withDataset]->(dl),(adrR)-[r7]->(rDS:RelationshipDS)
+          WHERE dl.name CONTAINS '`+ datasetChosed[0] + `' and dl.uuid = '` + datasetChosed[1] + `'
+          AND
+          (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and round(toFloat(adrR.value),5)>=toFloat(` + value + `)
           RETURN DISTINCT dl,rDS,autreDS,adrR,r1,r2,r3,r4,r5,r6,r7`
   }
   // console.log(query4)
@@ -2721,18 +2843,17 @@ function getGrapheViz4Seuil() {
 async function getAnalysisRelationshipAtt(idsource, nameAtt, relationName, nameAtt2, mapRelationAtt, resolve) {
   var timestamp = Date.now();
   api
-    .getRelationshipAttribute(idsource, nameAtt, 'relationValue', relationName, nameAtt2)
-    .then(p => {
-      if (p !== undefined && p.length > 0) {
-        //console.log('key : ' + nameAtt + '&' + nameAtt2 + '&' + relationName + ' ||| value : ' + p[0].value)
-        mapRelationAtt.set(nameAtt + '&' + nameAtt2 + '&' + relationName, p[0].value)
-      } else {
-        //mapRelationAtt.set(nameAtt + '&' + nameAtt2 + '&' + relationName, '');
-      }
-      if (resolve !== undefined) {
-        resolve();
-      }
-    }, 'json')
+      .getRelationshipAttribute(idsource, nameAtt, 'relationValue', relationName, nameAtt2)
+      .then(p => {
+        if (p !== undefined && p.length > 0) {
+          mapRelationAtt.set(nameAtt + '&' + nameAtt2 + '&' + relationName, p[0].value)
+        } else {
+          //mapRelationAtt.set(nameAtt + '&' + nameAtt2 + '&' + relationName, '');
+        }
+        if (resolve !== undefined) {
+          resolve();
+        }
+      }, 'json')
 }
 
 //Function to get all attribute linked by a relation with the target
@@ -2740,62 +2861,61 @@ async function getAnalyseOfRelationship(id, relationlist) {
   var promises = [];
   var mapRelationAtt = new Map;
   api
-    .getRelationshipAttribute(id, '', 'analyse', relationlist)
-    .then(p => {
-      $listBody = $('#attribute_' + relationlist)
+      .getRelationshipAttribute(id, '', 'analyse', relationlist)
+      .then(p => {
+        $listBody = $('#attribute_' + relationlist)
 
-      for (var i = 0; i < p.length; i++) {
-        for (var j = i; j < p.length; j++) {
-          if (p[j].name != p[i].name) {
-            promises.push(new Promise((resolve, reject) => { getAnalysisRelationshipAtt(id, p[i].name, $listBody.closest('div').attr('id'), p[j].name, mapRelationAtt, resolve) }));
-          }
-        }
-      }
-
-      Promise.all(promises).then(() => {
-        console.log('Promise finit : ' + mapRelationAtt.size);
-        console.log(mapRelationAtt.values())
-        var valueMin = Math.min(...mapRelationAtt.values());
-        var valueMax = Math.max(...mapRelationAtt.values());
-        console.log(valueMin + ' ||| ' + valueMax)
-        var arrayObj=Array.from(mapRelationAtt);
-        arrayObj.sort(function(a,b){return b[1]-a[1]})
-        var typeRelation
-        for (var i=0; i<arrayObj.length; i++){
-          $listBody = $('#attribute_' + arrayObj[i][0].split('&')[2])
-          typeRelation = arrayObj[i][0].split('&')[2]
-          if (arrayObj[i][1]) {
-            var valueNumber = Number(arrayObj[i][1]).toFixed(5)
-            if (arrayObj[i][1] == valueMin) {
-              $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : red">' + valueNumber + '</span></td></tr>')
-            } else {
-              if (arrayObj[i][1] == valueMax) {
-                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : green">' + valueNumber + '</span></td></tr>')
-              } else {
-                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + valueNumber  + '</td></tr>')
-              }
+        for (var i = 0; i < p.length; i++) {
+          for (var j = i; j < p.length; j++) {
+            if (p[j].name != p[i].name) {
+              promises.push(new Promise((resolve, reject) => { getAnalysisRelationshipAtt(id, p[i].name, $listBody.closest('div').attr('id'), p[j].name, mapRelationAtt, resolve) }));
             }
           }
         }
-        $rangeBody = $('#' + typeRelation)
-        var valueMaxRounding = valueMax.toFixed(5)
-        var valueMinRounding = valueMin.toFixed(5)
-        $rangeBody.append("</br><p><b>Threshold</b>:<span id='seuil_"+ typeRelation +"'></span><input type='button' id='b_"+ typeRelation +"' name='blue' value='Show part blue'/></p><input type='range' id='r_"+ typeRelation +"' value='"+valueMaxRounding+"' max='"+valueMaxRounding+"' min='"+valueMinRounding+"' step='0.00001'/><div class='row'> <div class='col-md-6'>"+valueMinRounding+"</div><div class='col-md-6' ><div class='text-right'>"+valueMaxRounding+"</div></div></div></br>")
-        document.getElementById('r_'+typeRelation).addEventListener("change",getGrapheViz5Seuil)
-        document.getElementById('b_'+typeRelation).addEventListener("click",changRange)
-        document.getElementById('b_'+typeRelation).addEventListener("click",getGrapheViz5Seuil)
-      });
-    }, 'json')
+
+        Promise.all(promises).then(() => {
+          console.log('Promise finit : ' + mapRelationAtt.size);
+          var valueMin = Math.min(...mapRelationAtt.values());
+          var valueMax = Math.max(...mapRelationAtt.values());
+          console.log(valueMin + ' ||| ' + valueMax)
+          var arrayObj = Array.from(mapRelationAtt);
+          arrayObj.sort(function (a, b) { return b[1] - a[1] })
+          var typeRelation
+          for (var i = 0; i < arrayObj.length; i++) {
+            $listBody = $('#attribute_' + arrayObj[i][0].split('&')[2])
+            typeRelation = arrayObj[i][0].split('&')[2]
+            if (arrayObj[i][1]) {
+              var valueNumber = Number(arrayObj[i][1]).toFixed(5)
+              if (arrayObj[i][1] == valueMin) {
+                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : red">' + valueNumber + '</span></td></tr>')
+              } else {
+                if (arrayObj[i][1] == valueMax) {
+                  $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : green">' + valueNumber + '</span></td></tr>')
+                } else {
+                  $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + valueNumber + '</td></tr>')
+                }
+              }
+            }
+          }
+          $rangeBody = $('#' + typeRelation)
+          var valueMaxRounding = valueMax.toFixed(5)
+          var valueMinRounding = valueMin.toFixed(5)
+          $rangeBody.append("</br><p><b>Threshold</b>:<span id='seuil_" + typeRelation + "'></span><input type='button' id='b_" + typeRelation + "' name='blue' value='Show part blue'/></p><input type='range' id='r_" + typeRelation + "' value='" + valueMaxRounding + "' max='" + valueMaxRounding + "' min='" + valueMinRounding + "' step='0.00001'/><div class='row'> <div class='col-md-6'>" + valueMinRounding + "</div><div class='col-md-6' ><div class='text-right'>" + valueMaxRounding + "</div></div></div></br>")
+          document.getElementById('r_' + typeRelation).addEventListener("change", getGrapheViz5Seuil)
+          document.getElementById('b_' + typeRelation).addEventListener("click", changRange)
+          document.getElementById('b_' + typeRelation).addEventListener("click", getGrapheViz5Seuil)
+        });
+      }, 'json')
 }
 
 //Function to change the range of graph relationship
-function changRange(){
-  if (this.name=='blue'){
-    this.name='grey'
-    this.value='Show part grey'
-  }else{
-    this.name='blue'
-    this.value='Show part blue'
+function changRange() {
+  if (this.name == 'blue') {
+    this.name = 'grey'
+    this.value = 'Show part grey'
+  } else {
+    this.name = 'blue'
+    this.value = 'Show part blue'
   }
 }
 
@@ -2803,21 +2923,21 @@ function changRange(){
 function getGrapheViz5Seuil() {
   console.log(this.id.substring(2))
   // console.log(trans)
-  var value = document.getElementById('r_'+this.id.substring(2)).value ;
-  console.log(document.getElementById('r_'+this.id.substring(2)).value) ;
-  document.getElementById('seuil_'+this.id.substring(2)).innerHTML = value;
-  console.log(document.getElementById('b_'+this.id.substring(2)).value)
-  if (document.getElementById('b_'+this.id.substring(2)).name=='blue'){
+  var value = document.getElementById('r_' + this.id.substring(2)).value;
+  console.log(document.getElementById('r_' + this.id.substring(2)).value);
+  document.getElementById('seuil_' + this.id.substring(2)).innerHTML = value;
+  console.log(document.getElementById('b_' + this.id.substring(2)).value)
+  if (document.getElementById('b_' + this.id.substring(2)).name == 'blue') {
     query5 = `MATCH (dl)-[]-(e:EntityClass)-[]-(a),(a)-[r1:hasAttribute]-(AA:AnalysisAttribute)-[r2:useMeasure]-(RA:RelationshipAtt),(AA)-[r3:hasAttribute]-(a2)
                   WHERE dl.uuid = '` + trans + `'
                   AND
-                  (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and round(toFloat(AA.value),5)<=toFloat(`+value +`)
+                  (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and round(toFloat(AA.value),5)<=toFloat(` + value + `)
                   RETURN DISTINCT a,r1,AA,r2,RA,a2,r3`
-  }else{
+  } else {
     query5 = `MATCH (dl)-[]-(e:EntityClass)-[]-(a),(a)-[r1:hasAttribute]-(AA:AnalysisAttribute)-[r2:useMeasure]-(RA:RelationshipAtt),(AA)-[r3:hasAttribute]-(a2)
                   WHERE dl.uuid = '` + trans + `'
                   AND
-                  (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and round(toFloat(AA.value),5)>=toFloat(`+value +`)
+                  (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and round(toFloat(AA.value),5)>=toFloat(` + value + `)
                   RETURN DISTINCT a,r1,AA,r2,RA,a2,r3`
   }
   console.log(query5)
@@ -2848,7 +2968,7 @@ function usedOpeInit() {
       $list.append("<div class='usedOpeList' style='display: none'> <input type='checkbox' classe='usedOperation' name='usedOpe" + p[i].name + "' id='" + p[i].name + "'><label for='usedOpe" + p[i].name + "'>" + p[i].name + "</label></div>")
       //Add for drop-down menu
       var elt2 = document.getElementById("DropdownMenuusedop");
-      elt2.insertAdjacentHTML('beforeend', "<li><a name='usedOpLink' id='usedOperation_"+p[i].name+"'>"+ p[i].name +"</a></li>");
+      elt2.insertAdjacentHTML('beforeend', "<li><a name='usedOpLink' id='usedOperation_" + p[i].name + "'>" + p[i].name + "</a></li>");
     }
     //click event for drop-down menu
     var usedOpLink = document.getElementsByName("usedOpLink");
@@ -2870,7 +2990,7 @@ function landmarkersInit(study = 'default') {
         $list.append("<div class='landmarkerList' style='display: none'> <input type='checkbox' classe='landmarkers' name='landmarker$" + p[i].name + "' id='" + p[i].name + "'><label for='landmarker$" + p[i].name + "'>" + p[i].name + "</label></div>")
         //Add for drop-down menu
         var elt2 = document.getElementById("DropdownMenulandmarker");
-        elt2.insertAdjacentHTML('beforeend', "<li><a name='landmarkerLink' id='landmarker_"+p[i].name+"'>"+ p[i].name +"</a></li>");
+        elt2.insertAdjacentHTML('beforeend', "<li><a name='landmarkerLink' id='landmarker_" + p[i].name + "'>" + p[i].name + "</a></li>");
       }
     }
   }, "json");
@@ -2891,7 +3011,7 @@ function parameterInit(study = 'default') {
         $list.append("<div class='parameterList' style='display: none'> <input type='checkbox' classe='parameter' name='parameter$" + p[i].name + "' id='" + p[i].name + "' '><label for='parameter$" + p[i].name + "'>" + p[i].name + "</label></div>")
         //Add for drop-down menu
         var elt2 = document.getElementById("DropdownMenuparameter");
-        elt2.insertAdjacentHTML('beforeend', "<li><a name='parameterLink' id='parameter_"+p[i].name+"'>"+ p[i].name +"</a></li>");
+        elt2.insertAdjacentHTML('beforeend', "<li><a name='parameterLink' id='parameter_" + p[i].name + "'>" + p[i].name + "</a></li>");
       }
     }
   }, "json");
@@ -2913,7 +3033,7 @@ function evaluationInit(study = 'default') {
         $list.append("<div class='evaluationList'> <input type='checkbox' classe='evaluation' name='evaluation$" + p[i].name + "' id='" + p[i].name + "' '><label for='evaluation$" + p[i].name + "'>" + p[i].name + "</label></div>")
         //Add for drop-down menu
         var elt2 = document.getElementById("DropdownMenuevaluation");
-        elt2.insertAdjacentHTML('beforeend', "<li><a name='evaluationLink' id='evaluation_"+p[i].name+"'>"+ p[i].name +"</a></li>");
+        elt2.insertAdjacentHTML('beforeend', "<li><a name='evaluationLink' id='evaluation_" + p[i].name + "'>" + p[i].name + "</a></li>");
       }
     }
   }, "json");
@@ -2934,7 +3054,7 @@ function languageProcessInit(tagsinput, language = "", date = "0001-01-01", type
       var listLanguage = [];
       for (var i = 0; i < p.length; i++) {
         if (listLanguage.indexOf(p[i].programLanguage) === -1) {
-          if(p[i].programLanguage) {
+          if (p[i].programLanguage) {
             $list2.append($("<div class='languageList'> <input type='checkbox' classe='language' name='language" + p[i].programLanguage + " ' id='" + p[i].programLanguage + "'> <label for='language" + p[i].programLanguage + "'>" + p[i].programLanguage + "</label></div>"));
             listLanguage.push(p[i].programLanguage)
           }
@@ -2956,13 +3076,13 @@ function excutionEnvironmentInit(tagsinput, language = "", date = "0001-01-01", 
 
         if (listexeEnv.indexOf(p[i].executionEnvironment) === -1) {
           // console.log("meiyou")
-           if(p[i].executionEnvironment) {
-            $list2.append($("<div class='exeEnvList' style='display: none'> <input type='checkbox' classe='exeEnv' name='exeEnv" + p[i].executionEnvironment + " ' id='" + p[i].executionEnvironment + "'> <label for='exeEnv" + p[i].executionEnvironment + "'>" +p[i].executionEnvironment + "</label></div>"));
-             listexeEnv.push(p[i].executionEnvironment)
-             //Add for drop-down menu
-             var elt2 = document.getElementById("DropdownMenuexeEnv");
-             elt2.insertAdjacentHTML('beforeend', "<li><a name='exeEnvLink' id='exeEnv_"+p[i].executionEnvironment+"'>"+ p[i].executionEnvironment +"</a></li>");
-           }
+          if (p[i].executionEnvironment) {
+            $list2.append($("<div class='exeEnvList' style='display: none'> <input type='checkbox' classe='exeEnv' name='exeEnv" + p[i].executionEnvironment + " ' id='" + p[i].executionEnvironment + "'> <label for='exeEnv" + p[i].executionEnvironment + "'>" + p[i].executionEnvironment + "</label></div>"));
+            listexeEnv.push(p[i].executionEnvironment)
+            //Add for drop-down menu
+            var elt2 = document.getElementById("DropdownMenuexeEnv");
+            elt2.insertAdjacentHTML('beforeend', "<li><a name='exeEnvLink' id='exeEnv_" + p[i].executionEnvironment + "'>" + p[i].executionEnvironment + "</a></li>");
+          }
         }
       }
       //Click event for drop-down menu
@@ -2977,62 +3097,62 @@ function excutionEnvironmentInit(tagsinput, language = "", date = "0001-01-01", 
 //Function to get process
 function showProcesses(tags, language = "", date = "0001-01-01", type = [], execuEnv = []) {
   api
-    .getProcesses(tags, language, date, type, execuEnv)
-    .then(p => {
-      if (p) {
-        //var $list = $(".names").empty();
-        var $list = $("#processNames")
-        for (var i = 0; i < p.length; i++) {
-          $list.append($("<tr><td class='Process' id='" + p[i].name + "$" + p[i].uuid + "'>" + p[i].name + "</td></tr>"));
+      .getProcesses(tags, language, date, type, execuEnv)
+      .then(p => {
+        if (p) {
+          //var $list = $(".names").empty();
+          var $list = $("#processNames")
+          for (var i = 0; i < p.length; i++) {
+            $list.append($("<tr><td class='Process' id='" + p[i].name + "$" + p[i].uuid + "'>" + p[i].name + "</td></tr>"));
+          }
+          console.log('nb items liste : ' + p.length)
         }
-        console.log('nb items liste : ' + p.length)
-      }
-    }, "json");
+      }, "json");
 }
 
 //function to get studies
-function showStudies(tags, type = '', landmarker = '', algoNames = '', omNames = '') {
+function showStudies(tags, type = '', aDate,landmarker = '', algoNames = '', omNames = '') {
   api
-    .getStudies(tags, type, landmarker, algoNames, omNames = '')
-    .then(p => {
-      if (p) {
-        //var $list = $(".names").empty();
-        var $list = $("#analyseNames")
-        // $list.empty()
-        var landList = []
-        for (var i = 0; i < p.length; i++) {
+      .getStudies(tags, type, aDate,landmarker, algoNames, omNames = '')
+      .then(p => {
+        if (p) {
+          //var $list = $(".names").empty();
+          var $list = $("#analyseNames")
+          // $list.empty()
+          var landList = []
+          for (var i = 0; i < p.length; i++) {
 
-          $list.append($("<tr><td class='Study'>" + p[i].name + "</td></tr>"));
-          if (!landList.includes(p[i].name)) {
-            parameterInit(p[i])
-            evaluationInit(p[i]);
-            landmarkersInit(p[i]);
-            landList.push(p[i].name);
+            $list.append($("<tr><td class='Study'>" + p[i].name + "</td></tr>"));
+            if (!landList.includes(p[i].name)) {
+              parameterInit(p[i])
+              evaluationInit(p[i]);
+              landmarkersInit(p[i]);
+              landList.push(p[i].name);
+            }
           }
+          console.log('nb items liste : ' + p.length)
         }
-        console.log('nb items liste : ' + p.length)
-      }
-    }, "json");
+      }, "json");
 }
 
 //function to get dataset
 function showDatabases(tags, type = 'defaultValue', date = '0001-01-01', quality = "", sensitivity = "", ECANames = "") {
   api
-    .getDatabases(tags, type, date, quality, sensitivity, ECANames)
-    .then(p => {
-      if (p) {
-        //var $list = $(".names").empty();
-        var $list = $("#dbNames")
-        for (var i = 0; i < p.length; i++) {
-          $list.append($("<tr><td class='Database' id='" + p[i].type + "$" + p[i].name + "$" + p[i].uuid + "'>" + p[i].name + "</td></tr>"));
+      .getDatabases(tags, type, date, quality, sensitivity, ECANames)
+      .then(p => {
+        if (p) {
+          //var $list = $(".names").empty();
+          var $list = $("#dbNames")
+          for (var i = 0; i < p.length; i++) {
+            $list.append($("<tr><td class='Database' id='" + p[i].type + "$" + p[i].name + "$" + p[i].uuid + "'>" + p[i].name + "</td></tr>"));
+          }
+          console.log('nb items liste : ' + p.length)
         }
-        console.log('nb items liste : ' + p.length)
-      }
-    }, "json");
+      }, "json");
 }
 
 //Click event with show of check box for execution environment
-function getexeEnvClick(){
+function getexeEnvClick() {
   // console.log(this.id)
   var input, filter, ul, li, a, i;
   input = document.getElementById(this.id);
@@ -3043,8 +3163,8 @@ function getexeEnvClick(){
   for (i = 0; i < a.length; i++) {
     txtValue = a[i].textContent || a[i].innerText;
     // console.log(txtValue)
-    var idexeEnv= txtValue.substr(2,txtValue.length-1)
-    if (filter===idexeEnv.toUpperCase()) {
+    var idexeEnv = txtValue.substr(2, txtValue.length - 1)
+    if (filter === idexeEnv.toUpperCase()) {
       // console.log("diqnshqngle")
       // console.log(a[i])
       a[i].style.display = "";
@@ -3058,7 +3178,7 @@ function getexeEnvClick(){
 }
 
 //Click event with show of check box for used operation
-function getusedOperationClick(){
+function getusedOperationClick() {
   console.log(this.id)
   var input, filter, ul, li, a, i;
   input = document.getElementById(this.id);
@@ -3070,8 +3190,8 @@ function getusedOperationClick(){
   for (i = 0; i < a.length; i++) {
     txtValue = a[i].textContent || a[i].innerText;
     // console.log(txtValue)
-    var idusedop= txtValue.substr(1,txtValue.length-1)
-    if (filter===idusedop.toUpperCase()) {
+    var idusedop = txtValue.substr(1, txtValue.length - 1)
+    if (filter === idusedop.toUpperCase()) {
       /*console.log("diqnshqngle")
       console.log(a[i])*/
       a[i].style.display = "";
@@ -3096,8 +3216,8 @@ function getLandmarkerClick() {
   // console.log(landmarkerList);
   for (i = 0; i < a.length; i++) {
     txtValue = a[i].textContent || a[i].innerText;
-    var idlandmarker= txtValue.substr(1,txtValue.length-1)
-    if (filter===idlandmarker.toUpperCase()) {
+    var idlandmarker = txtValue.substr(1, txtValue.length - 1)
+    if (filter === idlandmarker.toUpperCase()) {
       // console.log("diqnshqngle")
       a[i].style.display = "";
       var elt = document.getElementById(idlandmarker)
@@ -3121,10 +3241,10 @@ function getEvaluationClick() {
   // console.log(landmarkerList);
   for (i = 0; i < a.length; i++) {
     txtValue = a[i].textContent || a[i].innerText;
-    var idevaluation= txtValue.substr(1,txtValue.length-1)
+    var idevaluation = txtValue.substr(1, txtValue.length - 1)
     console.log("ttttttttttttttttttttttt")
     console.log(idevaluation)
-    if (filter===idevaluation.toUpperCase()) {
+    if (filter === idevaluation.toUpperCase()) {
       // console.log("diqnshqngle")
       a[i].style.display = "";
       var elt = document.getElementById(idevaluation)
@@ -3149,10 +3269,10 @@ function getParameterClick() {
   // console.log(landmarkerList);
   for (i = 0; i < a.length; i++) {
     txtValue = a[i].textContent || a[i].innerText;
-    var idparameter= txtValue.substr(1,txtValue.length-1)
+    var idparameter = txtValue.substr(1, txtValue.length - 1)
     console.log("ttttttttttttttttttttttt")
     console.log(idparameter)
-    if (filter===idparameter.toUpperCase()) {
+    if (filter === idparameter.toUpperCase()) {
       // console.log("diqnshqngle")
       a[i].style.display = "";
       var elt = document.getElementById(idparameter)
@@ -3161,15 +3281,15 @@ function getParameterClick() {
       console.log(parameterList);*/
     }
   }
-/*  $("#analyseNames").empty();
-  showStudies(tagsinput, typeRecherche, landmarkerList);*/
+  /*  $("#analyseNames").empty();
+    showStudies(tagsinput, typeRecherche, landmarkerList);*/
 }
 
 //Function to draw relationDataset without condition
-function getGrapheViz4Init(){
+function getGrapheViz4Init() {
   /*console.log(this.id)
   console.log(trans)*/
-  document.getElementById("viz4").style.display="block"
+  document.getElementById("viz4").style.display = "block"
   var relationDS = this.id.substring(2)
   //query4 for dataset relationship
   query4 = `MATCH (dl)<-[r1:withDataset]-()-[r2:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r3:withDataset]-()-[r4:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r5:withDataset]-(adrR)-[r6:withDataset]->(dl) 
@@ -3200,10 +3320,10 @@ function getGrapheViz4Init(){
 }
 
 //Function to draw relationAttribute without condition
-function getGrapheViz5Init(){
+function getGrapheViz5Init() {
   /*console.log(this.id)
   console.log(trans)*/
-  document.getElementById("viz5").style.display="block"
+  document.getElementById("viz5").style.display = "block"
   var relationAtt = this.id.substring(2)
   query5 = `MATCH (dl)-[]-(e:EntityClass)-[]-(a),(a)-[r1:hasAttribute]-(AA:AnalysisAttribute)-[r2:useMeasure]-(RA:RelationshipAtt),(AA)-[r3:hasAttribute]-(a2)
                   WHERE dl.uuid = '` + trans + `'
@@ -3246,19 +3366,11 @@ elem.onchange = function (event) {
 
     var ldot = files[i].name.lastIndexOf(".");
     var type = files[i].name.substring(ldot + 1);
-    //var objURL = getObjectURL(files[i]);
-    //alert(objURL);
-    console.log(type);
-
-    //if (type == 'csv'){
-
-    //}
   }
 }
 
 function printTags() {
 
-  console.log(NumberTags);
   var zone = "zone" + NumberTags;
   var zoneaff = "zoneaff" + NumberTags;
   var lien = "lien" + NumberTags;
@@ -3268,9 +3380,7 @@ function printTags() {
   //To receive result of BD
   var length = 0;
   var tag = document.getElementById(zone).value;
-  console.log(tag);
   api.getTags(tag).then(p => {
-    //console.log(p.length);
     length = p.length;
     if (length === 0) {
 
@@ -3284,7 +3394,6 @@ function printTags() {
       }
       elt2.style.display = "block";
       for (x = 0; x < length; x++) {
-        //console.log(p[x].name);
         elt2.insertAdjacentHTML('beforeend', "<a name='" + lien + "'>" + p[x].name + "</a><br />");
       }
 
@@ -3353,4 +3462,3 @@ function setMaxDate() {
   document.getElementById("ingestionEndTime").setAttribute("max", today);
 
 }
-
