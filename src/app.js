@@ -2100,6 +2100,55 @@ $(function () {
         $("#analyseNames").empty()
         showStudies(tagsinput, typeRecherche);
       }
+<<<<<<< HEAD
+=======
+      if (typeRecherche.includes("machineLearning") || (typeRecherche.includes("machineLearning") && typeRecherche.includes("otherAnalysis"))) {
+        $('#supervised')[0].style.display = 'inline-block'
+        $('#descriptive')[0].style.display = 'inline-block'
+        $('#diagnostic')[0].style.display = 'inline-block'
+        $('#predictive')[0].style.display = 'inline-block'
+        $('#prescriptive')[0].style.display = 'inline-block'
+        $('label[for="supervised"]')[0].style.display = 'inline-block'
+        $('label[for="descriptive"]')[0].style.display = 'inline-block'
+        $('label[for="diagnostic"]')[0].style.display = 'inline-block'
+        $('label[for="predictive"]')[0].style.display = 'inline-block'
+        $('label[for="prescriptive"]')[0].style.display = 'inline-block'
+        $('#algoNames')[0].style.display = 'inline-block'
+        $('#algosupervised')[0].style.display = 'inline-block'
+        $('#algoUnsupervised')[0].style.display = 'inline-block'
+        $('#AlgoReinforcement')[0].style.display = 'inline-block'
+        $('#parameter')[0].style.display = 'inline-block'
+        $('#evaluation')[0].style.display = 'inline-block'
+        $('#landmarker')[0].style.display = 'inline-block'
+        $('label[for="algoNames"]')[0].style.display = 'inline-block'
+        $('label[for="algosupervised"]')[0].style.display = 'inline-block'
+        $('label[for="algoUnsupervised"]')[0].style.display = 'inline-block'
+        $('label[for="algoReinforcement"]')[0].style.display = 'inline-block'
+      }
+      if (typeRecherche.includes("otherAnalysis") && !(typeRecherche.includes("machineLearning"))) {
+        $('#supervised')[0].style.display = 'none'
+        $('#descriptive')[0].style.display = 'none'
+        $('#diagnostic')[0].style.display = 'none'
+        $('#predictive')[0].style.display = 'none'
+        $('#prescriptive')[0].style.display = 'none'
+        $('label[for="supervised"]')[0].style.display = 'none'
+        $('label[for="descriptive"]')[0].style.display = 'none'
+        $('label[for="diagnostic"]')[0].style.display = 'none'
+        $('label[for="predictive"]')[0].style.display = 'none'
+        $('label[for="prescriptive"]')[0].style.display = 'none'
+        $('#algoNames')[0].style.display = 'none'
+        $('#algosupervised')[0].style.display = 'none'
+        $('#algoUnsupervised')[0].style.display = 'none'
+        $('#AlgoReinforcement')[0].style.display = 'none'
+        $('#parameter')[0].style.display = 'none'
+        $('#evaluation')[0].style.display = 'none'
+        $('#landmarker')[0].style.display = 'none'
+        $('label[for="algoNames"]')[0].style.display = 'none'
+        $('label[for="algosupervised"]')[0].style.display = 'none'
+        $('label[for="algoUnsupervised"]')[0].style.display = 'none'
+        $('label[for="algoReinforcement"]')[0].style.display = 'none'
+      }
+>>>>>>> parent of 330c64b (update analisys filter)
     } else {
       //Remove the filtre of the unchecked box
       const index = typeRecherche.indexOf(this.id);
@@ -2126,6 +2175,55 @@ $(function () {
           $("#analyseNames").empty()
           showStudies(tagsinput, typeRecherche);
         }
+<<<<<<< HEAD
+=======
+        if (typeRecherche.includes("machineLearning") || (typeRecherche.includes("machineLearning") && typeRecherche.includes("otherAnalysis"))) {
+          $('#supervised')[0].style.display = 'inline-block'
+          $('#descriptive')[0].style.display = 'inline-block'
+          $('#diagnostic')[0].style.display = 'inline-block'
+          $('#predictive')[0].style.display = 'inline-block'
+          $('#prescriptive')[0].style.display = 'inline-block'
+          $('label[for="supervised"]')[0].style.display = 'inline-block'
+          $('label[for="descriptive"]')[0].style.display = 'inline-block'
+          $('label[for="diagnostic"]')[0].style.display = 'inline-block'
+          $('label[for="predictive"]')[0].style.display = 'inline-block'
+          $('label[for="prescriptive"]')[0].style.display = 'inline-block'
+          $('#algoNames')[0].style.display = 'inline-block'
+          $('#algosupervised')[0].style.display = 'inline-block'
+          $('#algoUnsupervised')[0].style.display = 'inline-block'
+          $('#AlgoReinforcement')[0].style.display = 'inline-block'
+          $('#parameter')[0].style.display = 'inline-block'
+          $('#evaluation')[0].style.display = 'inline-block'
+          $('#landmarker')[0].style.display = 'inline-block'
+          $('label[for="algoNames"]')[0].style.display = 'inline-block'
+          $('label[for="algosupervised"]')[0].style.display = 'inline-block'
+          $('label[for="algoUnsupervised"]')[0].style.display = 'inline-block'
+          $('label[for="algoReinforcement"]')[0].style.display = 'inline-block'
+        }
+        if (typeRecherche.includes("otherAnalysis") && !(typeRecherche.includes("machineLearning"))) {
+          $('#supervised')[0].style.display = 'none'
+          $('#descriptive')[0].style.display = 'none'
+          $('#diagnostic')[0].style.display = 'none'
+          $('#predictive')[0].style.display = 'none'
+          $('#prescriptive')[0].style.display = 'none'
+          $('label[for="supervised"]')[0].style.display = 'none'
+          $('label[for="descriptive"]')[0].style.display = 'none'
+          $('label[for="diagnostic"]')[0].style.display = 'none'
+          $('label[for="predictive"]')[0].style.display = 'none'
+          $('label[for="prescriptive"]')[0].style.display = 'none'
+          $('#algoNames')[0].style.display = 'none'
+          $('#algosupervised')[0].style.display = 'none'
+          $('#algoUnsupervised')[0].style.display = 'none'
+          $('#AlgoReinforcement')[0].style.display = 'none'
+          $('#parameter')[0].style.display = 'none'
+          $('#evaluation')[0].style.display = 'none'
+          $('#landmarker')[0].style.display = 'none'
+          $('label[for="algoNames"]')[0].style.display = 'none'
+          $('label[for="algosupervised"]')[0].style.display = 'none'
+          $('label[for="algoUnsupervised"]')[0].style.display = 'none'
+          $('label[for="algoReinforcement"]')[0].style.display = 'none'
+        }
+>>>>>>> parent of 330c64b (update analisys filter)
       }
     }
   });
@@ -2541,14 +2639,20 @@ $(function () {
   $("#algoNames").keyup(function () {
     $("#analyseNames").empty();
     algoNames = document.getElementById("algoNames");
+<<<<<<< HEAD
     console.log(algoNames.value)
+=======
+>>>>>>> parent of 330c64b (update analisys filter)
     showStudies(tagsinput, typeRecherche, landmarkerList, algoNames.value)
   });
 
   $("#omNames").keyup(function () {
     $("#analyseNames").empty();
     omNames = document.getElementById("omNames");
+<<<<<<< HEAD
     console.log(omNames.value)
+=======
+>>>>>>> parent of 330c64b (update analisys filter)
     showStudies(tagsinput, typeRecherche, landmarkerList, algoNames.value, omNames.value)
   });
 
