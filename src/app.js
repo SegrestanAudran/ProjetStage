@@ -2640,7 +2640,10 @@ $(function () {
     $("#analyseNames").empty();
     algoNames = document.getElementById("algoNames");
 <<<<<<< HEAD
+<<<<<<< HEAD
     console.log(algoNames.value)
+=======
+>>>>>>> parent of 330c64b (update analisys filter)
 =======
 >>>>>>> parent of 330c64b (update analisys filter)
     showStudies(tagsinput, typeRecherche, landmarkerList, algoNames.value)
@@ -2650,7 +2653,10 @@ $(function () {
     $("#analyseNames").empty();
     omNames = document.getElementById("omNames");
 <<<<<<< HEAD
+<<<<<<< HEAD
     console.log(omNames.value)
+=======
+>>>>>>> parent of 330c64b (update analisys filter)
 =======
 >>>>>>> parent of 330c64b (update analisys filter)
     showStudies(tagsinput, typeRecherche, landmarkerList, algoNames.value, omNames.value)
