@@ -2793,7 +2793,6 @@ async function getDatasetOfRelationship(dsName, dsId, relationlist) {
         }
         $rangeBody = $('#' + typerelationshipDS)
 <<<<<<< HEAD
-<<<<<<< HEAD
         var valueMaxRounding = valueMax.toFixed(5)
         var valueMinRounding = valueMin.toFixed(5)
         $rangeBody.append("</br><p><b>Threshold</b>:<span id='seuil_" + typerelationshipDS + "'></span><input type='button' id='b_" + typerelationshipDS + "' name='blue' value='Show part blue'/></p><input type='range' id='r_" + typerelationshipDS + "' value='" + valueMaxRounding + "' max='" + valueMaxRounding + "' min='" + valueMinRounding + "' step='0.00001'/><div class='row'> <div class='col-md-6'>" + valueMinRounding + "</div><div class='col-md-6'><div class='text-right'>" + valueMaxRounding + "</div></div></div>")
@@ -2801,8 +2800,6 @@ async function getDatasetOfRelationship(dsName, dsId, relationlist) {
         document.getElementById('b_' + typerelationshipDS).addEventListener("click", changRange)
         document.getElementById('b_' + typerelationshipDS).addEventListener("click", getGrapheViz4Seuil)
 =======
-=======
->>>>>>> parent of c78f26c (Change value)
         $rangeBody.append("</br><p><b>Threshold</b>:<span id='seuil_"+ typerelationshipDS +"'></span><input type='button' id='b_"+ typerelationshipDS +"' name='blue' value='Show part blue'/></p><input type='range' id='r_"+ typerelationshipDS +"' value='"+valueMax+"' max='"+valueMax+"' min='"+valueMin+"' step='any'/><div class='row'> <div class='col-md-6'>"+valueMin+"</div><div class='col-md-6' ><div class='text-right'>"+valueMax+"</div></div></div>")
         document.getElementById('r_'+typerelationshipDS).addEventListener("change",getGrapheViz4Seuil)
         document.getElementById('b_'+typerelationshipDS).addEventListener("click",changRange)
@@ -2823,11 +2820,7 @@ function getGrapheViz4Seuil() {
           WHERE dl.name CONTAINS '`+ datasetChosed[0] + `' and dl.uuid = '` + datasetChosed[1] + `'
           AND
 <<<<<<< HEAD
-<<<<<<< HEAD
           (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and round(toFloat(adrR.value),5)<=toFloat(` + value + `)
-=======
-          (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and toFloat(adrR.value)<=toFloat(`+value +`)
->>>>>>> parent of c78f26c (Change value)
 =======
           (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and toFloat(adrR.value)<=toFloat(`+value +`)
 >>>>>>> parent of c78f26c (Change value)
@@ -2837,11 +2830,7 @@ function getGrapheViz4Seuil() {
           WHERE dl.name CONTAINS '`+ datasetChosed[0] + `' and dl.uuid = '` + datasetChosed[1] + `'
           AND
 <<<<<<< HEAD
-<<<<<<< HEAD
           (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and round(toFloat(adrR.value),5)>=toFloat(` + value + `)
-=======
-          (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and toFloat(adrR.value)>=toFloat(`+value +`)
->>>>>>> parent of c78f26c (Change value)
 =======
           (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and toFloat(adrR.value)>=toFloat(`+value +`)
 >>>>>>> parent of c78f26c (Change value)
@@ -2922,11 +2911,7 @@ async function getAnalyseOfRelationship(id, relationlist) {
                 $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : green">' + arrayObj[i][1] + '</span></td></tr>')
               } else {
 <<<<<<< HEAD
-<<<<<<< HEAD
                 $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + valueNumber + '</td></tr>')
-=======
-                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + arrayObj[i][1] + '</td></tr>')
->>>>>>> parent of c78f26c (Change value)
 =======
                 $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + arrayObj[i][1] + '</td></tr>')
 >>>>>>> parent of c78f26c (Change value)
@@ -2936,7 +2921,6 @@ async function getAnalyseOfRelationship(id, relationlist) {
         }
         $rangeBody = $('#' + typeRelation)
 <<<<<<< HEAD
-<<<<<<< HEAD
         var valueMaxRounding = valueMax.toFixed(5)
         var valueMinRounding = valueMin.toFixed(5)
         $rangeBody.append("</br><p><b>Threshold</b>:<span id='seuil_" + typeRelation + "'></span><input type='button' id='b_" + typeRelation + "' name='blue' value='Show part blue'/></p><input type='range' id='r_" + typeRelation + "' value='" + valueMaxRounding + "' max='" + valueMaxRounding + "' min='" + valueMinRounding + "' step='0.00001'/><div class='row'> <div class='col-md-6'>" + valueMinRounding + "</div><div class='col-md-6' ><div class='text-right'>" + valueMaxRounding + "</div></div></div></br>")
@@ -2944,8 +2928,6 @@ async function getAnalyseOfRelationship(id, relationlist) {
         document.getElementById('b_' + typeRelation).addEventListener("click", changRange)
         document.getElementById('b_' + typeRelation).addEventListener("click", getGrapheViz5Seuil)
 =======
-=======
->>>>>>> parent of c78f26c (Change value)
         $rangeBody.append("</br><p><b>Threshold</b>:<span id='seuil_"+ typeRelation +"'></span><input type='button' id='b_"+ typeRelation +"' name='blue' value='Show part blue'/></p><input type='range' id='r_"+ typeRelation +"' value='"+valueMax+"' max='"+valueMax+"' min='"+valueMin+"' step='any'/><div class='row'> <div class='col-md-6'>"+valueMin+"</div><div class='col-md-6' ><div class='text-right'>"+valueMax+"</div></div></div></br>")
         document.getElementById('r_'+typeRelation).addEventListener("change",getGrapheViz5Seuil)
         document.getElementById('b_'+typeRelation).addEventListener("click",changRange)
@@ -2989,9 +2971,6 @@ function getGrapheViz5Seuil() {
                   WHERE dl.uuid = '` + trans + `'
                   AND
                   (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and toFloat(AA.value)<=toFloat(`+value +`)
-<<<<<<< HEAD
->>>>>>> parent of c78f26c (Change value)
-=======
 >>>>>>> parent of c78f26c (Change value)
                   RETURN DISTINCT a,r1,AA,r2,RA,a2,r3`
   } else {
@@ -2999,11 +2978,7 @@ function getGrapheViz5Seuil() {
                   WHERE dl.uuid = '` + trans + `'
                   AND
 <<<<<<< HEAD
-<<<<<<< HEAD
                   (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and round(toFloat(AA.value),5)>=toFloat(` + value + `)
-=======
-                  (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and toFloat(AA.value)>=toFloat(`+value +`)
->>>>>>> parent of c78f26c (Change value)
 =======
                   (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and toFloat(AA.value)>=toFloat(`+value +`)
 >>>>>>> parent of c78f26c (Change value)
