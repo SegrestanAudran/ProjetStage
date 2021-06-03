@@ -2780,14 +2780,13 @@ async function getDatasetOfRelationship(dsName, dsId, relationlist) {
           console.log(arrayObj[i][0].split('&')[2])
           typerelationshipDS = arrayObj[i][0].split('&')[2]
           if (arrayObj[i][1]) {
-            var valueNumber = Number(arrayObj[i][1]).toFixed(5)
             if (arrayObj[i][1] == valueMin) {
-              $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : red">' + valueNumber + '</span></td></tr>')
+              $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : red">' + arrayObj[i][1] + '</span></td></tr>')
             } else {
               if (arrayObj[i][1] == valueMax) {
-                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : green">' + valueNumber + '</span></td></tr>')
+                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : green">' + arrayObj[i][1] + '</span></td></tr>')
               } else {
-                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + valueNumber + '</td></tr>')
+                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + arrayObj[i][1] + '</td></tr>')
               }
             }
           }
@@ -2795,16 +2794,12 @@ async function getDatasetOfRelationship(dsName, dsId, relationlist) {
         $rangeBody = $('#' + typerelationshipDS)
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> parent of 97dfdfb (Update app.js)
         var valueMaxRounding = valueMax.toFixed(5)
         var valueMinRounding = valueMin.toFixed(5)
         $rangeBody.append("</br><p><b>Threshold</b>:<span id='seuil_" + typerelationshipDS + "'></span><input type='button' id='b_" + typerelationshipDS + "' name='blue' value='Show part blue'/></p><input type='range' id='r_" + typerelationshipDS + "' value='" + valueMaxRounding + "' max='" + valueMaxRounding + "' min='" + valueMinRounding + "' step='0.00001'/><div class='row'> <div class='col-md-6'>" + valueMinRounding + "</div><div class='col-md-6'><div class='text-right'>" + valueMaxRounding + "</div></div></div>")
         document.getElementById('r_' + typerelationshipDS).addEventListener("change", getGrapheViz4Seuil)
         document.getElementById('b_' + typerelationshipDS).addEventListener("click", changRange)
         document.getElementById('b_' + typerelationshipDS).addEventListener("click", getGrapheViz4Seuil)
-<<<<<<< HEAD
 =======
 =======
 >>>>>>> parent of c78f26c (Change value)
@@ -2813,8 +2808,6 @@ async function getDatasetOfRelationship(dsName, dsId, relationlist) {
         document.getElementById('b_'+typerelationshipDS).addEventListener("click",changRange)
         document.getElementById('b_'+typerelationshipDS).addEventListener("click",getGrapheViz4Seuil)
 >>>>>>> parent of c78f26c (Change value)
-=======
->>>>>>> parent of 97dfdfb (Update app.js)
       });
     }, 'json')
 }
@@ -2831,7 +2824,6 @@ function getGrapheViz4Seuil() {
           AND
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
           (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and round(toFloat(adrR.value),5)<=toFloat(` + value + `)
 =======
           (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and toFloat(adrR.value)<=toFloat(`+value +`)
@@ -2839,9 +2831,6 @@ function getGrapheViz4Seuil() {
 =======
           (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and toFloat(adrR.value)<=toFloat(`+value +`)
 >>>>>>> parent of c78f26c (Change value)
-=======
-          (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and round(toFloat(adrR.value),5)<=toFloat(` + value + `)
->>>>>>> parent of 97dfdfb (Update app.js)
           RETURN DISTINCT dl,rDS,autreDS,adrR,r1,r2,r3,r4,r5,r6,r7`
   } else {
     query4 = `MATCH (dl)<-[r1:withDataset]-()-[r2:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r3:withDataset]-()-[r4:hasRelationshipDataset]->(rDS:RelationshipDS),(autreDS)<-[r5:withDataset]-(adrR)-[r6:withDataset]->(dl),(adrR)-[r7]->(rDS:RelationshipDS)
@@ -2849,7 +2838,6 @@ function getGrapheViz4Seuil() {
           AND
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
           (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and round(toFloat(adrR.value),5)>=toFloat(` + value + `)
 =======
           (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and toFloat(adrR.value)>=toFloat(`+value +`)
@@ -2857,9 +2845,6 @@ function getGrapheViz4Seuil() {
 =======
           (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and toFloat(adrR.value)>=toFloat(`+value +`)
 >>>>>>> parent of c78f26c (Change value)
-=======
-          (autreDS:DLStructuredDataset OR autreDS:DLSemistructuredDataset OR autreDS:DLUnstructuredDataset) and rDS.name='`+ this.id.substring(2) + `' and round(toFloat(adrR.value),5)>=toFloat(` + value + `)
->>>>>>> parent of 97dfdfb (Update app.js)
           RETURN DISTINCT dl,rDS,autreDS,adrR,r1,r2,r3,r4,r5,r6,r7`
   }
   // console.log(query4)
@@ -2930,16 +2915,14 @@ async function getAnalyseOfRelationship(id, relationlist) {
           $listBody = $('#attribute_' + arrayObj[i][0].split('&')[2])
           typeRelation = arrayObj[i][0].split('&')[2]
           if (arrayObj[i][1]) {
-            var valueNumber = Number(arrayObj[i][1]).toFixed(5)
             if (arrayObj[i][1] == valueMin) {
-              $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : red">' + valueNumber + '</span></td></tr>')
+              $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : red">' + arrayObj[i][1] + '</span></td></tr>')
             } else {
               if (arrayObj[i][1] == valueMax) {
-                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : green">' + valueNumber + '</span></td></tr>')
+                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td><span style="color : green">' + arrayObj[i][1] + '</span></td></tr>')
               } else {
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
                 $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + valueNumber + '</td></tr>')
 =======
                 $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + arrayObj[i][1] + '</td></tr>')
@@ -2947,9 +2930,6 @@ async function getAnalyseOfRelationship(id, relationlist) {
 =======
                 $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + arrayObj[i][1] + '</td></tr>')
 >>>>>>> parent of c78f26c (Change value)
-=======
-                $listBody.append('<tr><td>' + arrayObj[i][0].split('&')[0] + ' - ' + arrayObj[i][0].split('&')[1] + ' : </td><td>' + valueNumber + '</td></tr>')
->>>>>>> parent of 97dfdfb (Update app.js)
               }
             }
           }
@@ -2957,16 +2937,12 @@ async function getAnalyseOfRelationship(id, relationlist) {
         $rangeBody = $('#' + typeRelation)
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> parent of 97dfdfb (Update app.js)
         var valueMaxRounding = valueMax.toFixed(5)
         var valueMinRounding = valueMin.toFixed(5)
         $rangeBody.append("</br><p><b>Threshold</b>:<span id='seuil_" + typeRelation + "'></span><input type='button' id='b_" + typeRelation + "' name='blue' value='Show part blue'/></p><input type='range' id='r_" + typeRelation + "' value='" + valueMaxRounding + "' max='" + valueMaxRounding + "' min='" + valueMinRounding + "' step='0.00001'/><div class='row'> <div class='col-md-6'>" + valueMinRounding + "</div><div class='col-md-6' ><div class='text-right'>" + valueMaxRounding + "</div></div></div></br>")
         document.getElementById('r_' + typeRelation).addEventListener("change", getGrapheViz5Seuil)
         document.getElementById('b_' + typeRelation).addEventListener("click", changRange)
         document.getElementById('b_' + typeRelation).addEventListener("click", getGrapheViz5Seuil)
-<<<<<<< HEAD
 =======
 =======
 >>>>>>> parent of c78f26c (Change value)
@@ -2975,8 +2951,6 @@ async function getAnalyseOfRelationship(id, relationlist) {
         document.getElementById('b_'+typeRelation).addEventListener("click",changRange)
         document.getElementById('b_'+typeRelation).addEventListener("click",getGrapheViz5Seuil)
 >>>>>>> parent of c78f26c (Change value)
-=======
->>>>>>> parent of 97dfdfb (Update app.js)
       });
     }, 'json')
 }
@@ -2996,6 +2970,7 @@ function changRange() {
 function getGrapheViz5Seuil() {
   console.log(this.id.substring(2))
   // console.log(trans)
+<<<<<<< HEAD
   var value = document.getElementById('r_' + this.id.substring(2)).value;
   console.log(document.getElementById('r_' + this.id.substring(2)).value);
   document.getElementById('seuil_' + this.id.substring(2)).innerHTML = value;
@@ -3005,7 +2980,6 @@ function getGrapheViz5Seuil() {
                   WHERE dl.uuid = '` + trans + `'
                   AND
                   (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and round(toFloat(AA.value),5)<=toFloat(` + value + `)
-<<<<<<< HEAD
 =======
   var value = document.getElementById('r_'+this.id.substring(2)).value ;
   document.getElementById('seuil_'+this.id.substring(2)).innerHTML = value;
@@ -3019,8 +2993,6 @@ function getGrapheViz5Seuil() {
 >>>>>>> parent of c78f26c (Change value)
 =======
 >>>>>>> parent of c78f26c (Change value)
-=======
->>>>>>> parent of 97dfdfb (Update app.js)
                   RETURN DISTINCT a,r1,AA,r2,RA,a2,r3`
   } else {
     query5 = `MATCH (dl)-[]-(e:EntityClass)-[]-(a),(a)-[r1:hasAttribute]-(AA:AnalysisAttribute)-[r2:useMeasure]-(RA:RelationshipAtt),(AA)-[r3:hasAttribute]-(a2)
@@ -3028,7 +3000,6 @@ function getGrapheViz5Seuil() {
                   AND
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
                   (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and round(toFloat(AA.value),5)>=toFloat(` + value + `)
 =======
                   (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and toFloat(AA.value)>=toFloat(`+value +`)
@@ -3036,12 +3007,8 @@ function getGrapheViz5Seuil() {
 =======
                   (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and toFloat(AA.value)>=toFloat(`+value +`)
 >>>>>>> parent of c78f26c (Change value)
-=======
-                  (a:NominalAttribute OR a:NumericAttribute OR a:Attribute) and RA.name='` + this.id.substring(2) + `' and round(toFloat(AA.value),5)>=toFloat(` + value + `)
->>>>>>> parent of 97dfdfb (Update app.js)
                   RETURN DISTINCT a,r1,AA,r2,RA,a2,r3`
   }
-  console.log(query5)
   api.getGraph(query5).then(p => {
     // create an array with nodes
     var nodes = new vis.DataSet(p[p.length - 1][0]);
