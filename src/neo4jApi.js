@@ -102,14 +102,11 @@ function getProcesses(tags, language = "", date = "0001-01-01", typeOpe = [], ex
 //Function to search study metadata
 function getStudies(tags, type, landmarker, algoNames, omNames) {
 <<<<<<< HEAD
-<<<<<<< HEAD
   console.log("tags : " + tags)
   console.log("type : " + type)
   console.log("landmarker : " + landmarker)
   console.log("algoNames : " + algoNames)
   console.log("omNames : " + omNames)
-=======
->>>>>>> parent of 330c64b (update analisys filter)
 =======
 >>>>>>> parent of 330c64b (update analisys filter)
   var session = driver.session();
