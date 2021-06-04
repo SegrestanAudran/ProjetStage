@@ -2076,7 +2076,6 @@ $(function () {
         showStudies(tagsinput, typeRecherche);
       }
       if (typeRecherche.includes("machineLearning") || (typeRecherche.includes("machineLearning") && typeRecherche.includes("otherAnalysis"))) {
-        showStudies(tagsinput, typeRecherche);
         $('#supervised')[0].style.display = 'inline-block'
         $('#descriptive')[0].style.display = 'inline-block'
         $('#diagnostic')[0].style.display = 'inline-block'
@@ -2100,7 +2099,6 @@ $(function () {
         $('label[for="algoReinforcement"]')[0].style.display = 'inline-block'
       }
       if (typeRecherche.includes("otherAnalysis") && !(typeRecherche.includes("machineLearning"))) {
-        showStudies(tagsinput, typeRecherche);
         $('#supervised')[0].style.display = 'none'
         $('#descriptive')[0].style.display = 'none'
         $('#diagnostic')[0].style.display = 'none'
@@ -2174,6 +2172,8 @@ $(function () {
           showStudies(tagsinput, typeRecherche);
         }
         if (typeRecherche.includes("machineLearning") || (typeRecherche.includes("machineLearning") && typeRecherche.includes("otherAnalysis"))) {
+          $("#dbNames").empty()
+          $("#analyseNames").empty()
           showProcesses(tagsinput, typeRecherche)
           showStudies(tagsinput, typeRecherche)
           showDatabases(tagsinput, typeRecherche)
@@ -2200,6 +2200,8 @@ $(function () {
           $('label[for="algoReinforcement"]')[0].style.display = 'inline-block'
         }
         if (typeRecherche.includes("otherAnalysis") && !(typeRecherche.includes("machineLearning"))) {
+          $("#dbNames").empty()
+          $("#analyseNames").empty()
           showProcesses(tagsinput, typeRecherche)
           showStudies(tagsinput, typeRecherche)
           showDatabases(tagsinput, typeRecherche)
