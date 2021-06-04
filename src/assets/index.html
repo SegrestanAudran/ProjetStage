@@ -110,38 +110,37 @@
 
 
                     </div>
-                    <a id='moreP'>more</a>
-                </div>
-                <div class="col-md-4">
-                    <h4>Analysis</h4>
-                    <input type="checkbox" class="analysetype" id="machineLearning" name="machineLearning"><label
-                        for="machineLearning">Machine Learning</label>
-                    <input type="checkbox" class="analysetype" id="otherAnalysis" name="otherAnalysis"><label
-                        for="otherAnalysis">Others</label>
-                    </br>
-                    <input type="checkbox" class="analysetype" id="supervised" name="supervised" style="display: none"><label
-                        for="supervised" style="display: none">Supervised</label>
-                    <input type="checkbox" class="analysetype" id="descriptive" name="descriptive" style="display: none"><label
-                        for="descriptive" style="display: none">Descriptive</label>
-                    <input type="checkbox" class="analysetype" id="diagnostic" name="diagnostic" style="display: none"><label
-                        for="diagnostic" style="display: none">Diagnostic</label>
-                    <input type="checkbox" class="analysetype" id="predictive" name="predictive" style="display: none"><label
-                        for="predictive" style="display: none">Predictive</label>
-                    <input type="checkbox" class="analysetype" id="prescriptive" name="prescriptive" style="display: none"><label
-                        for="prescriptive" style="display: none">Prescriptive</label>
-                    <br />
-                    <div id="moreAFilter" style='display: none'>
-                        <label for='aDate'>Creation Date after : </label><input type='date' class='inputDate'
-                                                                                id='aDate' name="aDate" value="0001-01-01">
-                        <button class="dropbtn" id="landmarker">Landmarker</button>
-                        <a id="landmarkerClear" style="display: none">Clear Landmarker</a>
+                    <div class="col-md-4">
+                        <h4>Analysis</h4>
+                        <input type="checkbox" class="analysetype" id="machineLearning" name="machineLearning"><label
+                            for="machineLearning">Machine Learning</label>
+                        <input type="checkbox" class="analysetype" id="otherAnalysis" name="otherAnalysis"><label
+                            for="otherAnalysis">Others</label>
+                        </br>
+                        <input type="checkbox" class="analysetype" id="supervised" name="supervised" style="display: none"><label
+                            for="supervised" style="display: none">Supervised</label>
+                        <input type="checkbox" class="analysetype" id="descriptive" name="descriptive" style="display: none"><label
+                            for="descriptive" style="display: none">Descriptive</label>
+                        <input type="checkbox" class="analysetype" id="diagnostic" name="diagnostic" style="display: none"><label
+                            for="diagnostic" style="display: none">Diagnostic</label>
+                        <input type="checkbox" class="analysetype" id="predictive" name="predictive" style="display: none"><label
+                            for="predictive" style="display: none">Predictive</label>
+                        <input type="checkbox" class="analysetype" id="prescriptive" name="prescriptive" style="display: none"><label
+                            for="prescriptive" style="display: none">Prescriptive</label>
+                        <br />
+                        <div id="moreAFilter" style='display: none'>
+                            <label for='aDate'>Creation Date after : </label><input type='date' class='inputDate'
+                                id='aDate' name="aDate" value="0001-01-01">
+                            <button class="dropbtn" id="landmarker" style="display: none">Landmarker</button>
+                            <a id="landmarkerClear" style="display: none">Clear Landmarker</a>
 
-                        <div class="dropdown">
-                            <div id="landmarkerDropdown" class="dropdown-content" style="display: none">
-                                <div class="dropdown">
-                                    <input type="text" placeholder="Search.." id="landmarkerInput"
-                                           class="dropdown-contente" data-toggle="dropdown">
-                                    <ul class="dropdown-menu pull-right" id="DropdownMenulandmarker" style="height:100px;width:270px;overflow:scroll"></ul>
+                            <div class="dropdown">
+                                <div id="landmarkerDropdown" class="dropdown-content" style="display: none">
+                                    <div class="dropdown">
+                                        <input type="text" placeholder="Search.." id="landmarkerInput"
+                                            class="dropdown-contente" data-toggle="dropdown" style="display: none">
+                                        <ul class="dropdown-menu pull-right" id="DropdownMenulandmarker" style="height:100px;width:270px;overflow:scroll"></ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -167,12 +166,34 @@
                         <button class="dropbtn" id="parameter">Parameter</button>
                         <a id="parameterClear" style="display: none">Clear Parameter</a>
 
-                        <div class="dropdown">
-                            <div id="parameterDropdown" class="dropdown-content" style="display: none">
-                                <div class="dropdown">
-                                    <input type="text" placeholder="Search.." id="parameterInput"
-                                           class="dropdown-contente" data-toggle="dropdown">
-                                    <ul class="dropdown-menu pull-right" id="DropdownMenuparameter" style="height:100px;width:270px;overflow:scroll"></ul>
+                            <label for='algoNames' style="display: none">Algorithm : </label><input type='text' class='algoinputNames'
+                                id='algoNames' name="algoNames" style="display: none">
+                            <br />
+                            <input type="checkbox" class="algotype" id="algosupervised" name="AlgoSupervised" style="display: none"><label
+                                for="algosupervised" style="display: none">Supervised</label>
+                            <input type="checkbox" class="algotype" id="algoUnsupervised" name="AlgoUnsupervised" style="display: none"><label
+                                for="algoUnsupervised" style="display: none">Unsupervised</label>
+                            <input type="checkbox" class="algotype" id="AlgoReinforcement"
+                                name="algoReinforcement" style="display: none"><label for="algoReinforcement" style="display: none">Reinforcement</label>
+                            <br />
+
+<!--                            <button class="dropbtn" id="parameter">Parameter</button>-->
+<!--                            <div class="dropdown">-->
+<!--                                <div id="parameterDropdown" class="dropdown-content" style="display: none">-->
+<!--                                    <input type="text" placeholder="Search.." id="parameterInput"-->
+<!--                                        class="dropdown-content">-->
+<!--                                </div>-->
+<!--                            </div>-->
+                            <button class="dropbtn" id="parameter" style="display: none">Parameter</button>
+                            <a id="parameterClear" style="display: none">Clear Parameter</a>
+
+                            <div class="dropdown">
+                                <div id="parameterDropdown" class="dropdown-content" style="display: none">
+                                    <div class="dropdown">
+                                        <input type="text" placeholder="Search.." id="parameterInput"
+                                               class="dropdown-contente" data-toggle="dropdown">
+                                        <ul class="dropdown-menu pull-right" id="DropdownMenuparameter" style="height:100px;width:270px;overflow:scroll"></ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -194,8 +215,19 @@
                             <div id="evaluationDropdown" class="dropdown-content" style="display: none">
                                 <div class="dropdown">
                                     <input type="text" placeholder="Search.." id="evaluationInput"
-                                           class="dropdown-contente" data-toggle="dropdown">
-                                    <ul class="dropdown-menu pull-right" id="DropdownMenuevaluation" style="height:100px;width:270px;overflow:scroll"></ul>
+                                        class="dropdown-content">
+                                </div>
+                            </div>-->
+                            <button class="dropbtn" id="evaluation" style="display: none">Evaluation</button>
+                            <a id="evaluationClear" style="display: none">Clear Evaluation</a>
+
+                            <div class="dropdown">
+                                <div id="evaluationDropdown" class="dropdown-content" style="display: none">
+                                    <div class="dropdown">
+                                        <input type="text" placeholder="Search.." id="evaluationInput"
+                                               class="dropdown-contente" data-toggle="dropdown">
+                                        <ul class="dropdown-menu pull-right" id="DropdownMenuevaluation" style="height:100px;width:270px;overflow:scroll"></ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -250,34 +282,33 @@
                 </table>
             </div>
         </div>
-    </div>
-    <div id='graphco' class='collapse'>
-        <div class="col-md-8">
-            <div class="panel panel-default">
+        <div id='graphco' class='collapse'>
+            <div class="col-md-8">
+                <div class="panel panel-default">
 
-                <div class="panel-heading" id="title">Graph <button id='back'
-                                                                    class='btn btn-secondary'>Back</button></div>
+                    <div class="panel-heading" id="title">Graph <button id='back'
+                            class='btn btn-secondary'>Back</button></div>
 
-                <ul class="nav nav-tabs">
-                    <li class="active"><a data-toggle="tab" href="#properties">Properties</a></li>
-                    <li><a data-toggle="tab" href="#viz">Lineage</a></li>
-                    <li><a data-toggle="tab" href="#viz2">Hyper-graph</a></li>
-                    <li id='operationButton'><a data-toggle="tab" href="#viz3">Operation</a></li>
-                    <li id='featureButton'><a data-toggle="tab" href="#features">Features</a></li>
-                    <li id='dsRelationButton'><a data-toggle="tab" href="#viz4_dataset">Relationship Dataset</a>
-                    </li>
-                    <li id='attRelationButton'><a data-toggle="tab" href="#viz5_attribute">Relationship
-                        Attribute</a></li>
-                    <li id='similarityButton'><a data-toggle="tab" href="#similarity">Similarity*</a></li>
-                </ul>
-                <div class="tab-content">
-                    <div id="properties" class="tab-pane fade  in active"></div>
-                    <div id="viz" class="tab-pane fade"></div>
-                    <div id="viz2" class="tab-pane fade"></div>
-                    <div id="viz3" class="tab-pane fade"></div>
-                    <div id="features" class="tab-pane fade">
-                        <div class='row'>
-                            <button type="button" class="btn btn-primary" data-toggle="modal"
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#properties">Properties</a></li>
+                        <li><a data-toggle="tab" href="#viz">Lineage</a></li>
+                        <li><a data-toggle="tab" href="#viz2">Hyper-graph</a></li>
+                        <li id='operationButton'><a data-toggle="tab" href="#viz3">Operation</a></li>
+                        <li id='featureButton'><a data-toggle="tab" href="#features">Features</a></li>
+                        <li id='dsRelationButton'><a data-toggle="tab" href="#viz4_dataset">Relationship of Dataset</a>
+                        </li>
+                        <li id='attRelationButton'><a data-toggle="tab" href="#viz5_attribute">Relationship of
+                                Attribute</a></li>
+                        <li id='similarityButton'><a data-toggle="tab" href="#similarity">Similarity*</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="properties" class="tab-pane fade  in active"></div>
+                        <div id="viz" class="tab-pane fade"></div>
+                        <div id="viz2" class="tab-pane fade"></div>
+                        <div id="viz3" class="tab-pane fade"></div>
+                        <div id="features" class="tab-pane fade">
+                            <div class='row'>
+                                <button type="button" class="btn btn-primary" data-toggle="modal"
                                     data-target="#AttributeModal">
                                 Attribute
                             </button>

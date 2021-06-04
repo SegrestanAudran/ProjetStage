@@ -1111,17 +1111,16 @@ $(function () {
         $('#similarityButton')[0].style.display = 'none';
         document.getElementById("EntityClassButtonAnalyse").style.display = 'block';
         api
-            .getStudies([$(this).text()], typeRecherche, landmarkerList, algoNames.value)
-            .then(p => {
-              if (p) {
-                json = JSON.parse(JSON.stringify(p[0]))
-                var $p = $("#properties")
-                for (propriete in p[0]) {
-                  if (propriete == 'creationDate' || propriete == "executionDate" || propriete == 'id') {
-                    $p.append("<p>" + propriete + " : " + json[propriete].low + "</p>");
-                  } else {
-                    $p.append("<p>" + propriete + " : " + json[propriete] + "</p>");
-                  }
+          .getStudies([$(this).text()], typeRecherche, aDate,landmarkerList, algoNames.value)
+          .then(p => {
+            if (p) {
+              json = JSON.parse(JSON.stringify(p[0]))
+              var $p = $("#properties")
+              for (propriete in p[0]) {
+                if (propriete == 'creationDate' || propriete == "executionDate" || propriete == 'id') {
+                  $p.append("<p>" + propriete + " : " + json[propriete].low + "</p>");
+                } else {
+                  $p.append("<p>" + propriete + " : " + json[propriete] + "</p>");
                 }
               }
             }, "json");
@@ -2238,17 +2237,17 @@ $(function () {
         $('label[for="diagnostic"]')[0].style.display = 'none'
         $('label[for="predictive"]')[0].style.display = 'none'
         $('label[for="prescriptive"]')[0].style.display = 'none'
-        $('#algoNames')[0].style.display = 'inline-block'
-        $('#algosupervised')[0].style.display = 'inline-block'
-        $('#algoUnsupervised')[0].style.display = 'inline-block'
-        $('#AlgoReinforcement')[0].style.display = 'inline-block'
-        $('#parameter')[0].style.display = 'inline-block'
-        $('#evaluation')[0].style.display = 'inline-block'
-        $('#landmarker')[0].style.display = 'inline-block'
-        $('label[for="algoNames"]')[0].style.display = 'inline-block'
-        $('label[for="algosupervised"]')[0].style.display = 'inline-block'
-        $('label[for="algoUnsupervised"]')[0].style.display = 'inline-block'
-        $('label[for="algoReinforcement"]')[0].style.display = 'inline-block'
+        $('#algoNames')[0].style.display = 'none'
+        $('#algosupervised')[0].style.display = 'none'
+        $('#algoUnsupervised')[0].style.display = 'none'
+        $('#AlgoReinforcement')[0].style.display = 'none'
+        $('#parameter')[0].style.display = 'none'
+        $('#evaluation')[0].style.display = 'none'
+        $('#landmarker')[0].style.display = 'none'
+        $('label[for="algoNames"]')[0].style.display = 'none'
+        $('label[for="algosupervised"]')[0].style.display = 'none'
+        $('label[for="algoUnsupervised"]')[0].style.display = 'none'
+        $('label[for="algoReinforcement"]')[0].style.display = 'none'
       }
 
     }
