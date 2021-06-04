@@ -1123,6 +1123,7 @@ $(function () {
                   $p.append("<p>" + propriete + " : " + json[propriete] + "</p>");
                 }
               }
+            }
             }, "json");
         query = `MATCH path = allshortestpaths ((d)-[*]-(u:Study {name:'` + $(this).text() + `'}))
         WHERE NONE(n IN nodes(path) WHERE n:Tag OR n:Operation) AND (d:DLStructuredDataset OR d:DLSemistructuredDataset OR d:UnstructuredDataset)
